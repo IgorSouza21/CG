@@ -41,6 +41,7 @@ public class Triangulo {
 		t.v1 = v1.copy();
 		t.v2 = v2.copy();
 		t.v3 = v3.copy();
+		t.normal = normal;
 		t.p1Original = p1Original.copy();
 		t.p2Original = p2Original.copy();
 		t.p3Original = p3Original.copy();

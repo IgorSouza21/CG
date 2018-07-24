@@ -78,7 +78,7 @@ public class TelaController extends Application implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		tela = 3;
+		tela = 4;
 		Operacoes.canvas = canvas;
 		try {
 			Operacoes.carregarParametrosCamera();
@@ -158,7 +158,7 @@ public class TelaController extends Application implements Initializable{
 				try {
 					Operacoes.fazTudo(width, height, carregada);
 				} catch (Exception e) {
-					erro(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}

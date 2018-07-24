@@ -143,47 +143,45 @@ public class Matriz {
 	public double[][] getInversa() {
 		if(inversa == null) {
 			if(getNumLinhas() == getNumColunas()) {
-				det = getDeterminante();
-				if(det != 0) { 
-					inversa = new double[getNumLinhas()][getNumColunas()];
-					if(matriz.length == 2) {
-						double valor = matriz[1][1]/det;
-						
-						if(valor == -0)
-							inversa[0][0] = 0;
-						else
-							inversa[0][0] = matriz[1][1]/det;
-						
-						valor = matriz[0][0]/det;
-						if(valor == -0)
-							inversa[1][1] = 0;
-						else
-							inversa[1][1] = matriz[0][0]/det;
-						
-						valor = -matriz[0][1]/det;
-						if(valor == -0)
-							inversa[0][1] = 0;
-						else
-							inversa[0][1] = -matriz[0][1]/det;
-						
-						valor = -matriz[1][0]/det;
-						if(valor == -0)
-							inversa[1][0] = 0;
-						else
-							inversa[1][0] = -matriz[1][0]/det;	
-					}
-					else if(matriz.length == 3) {
-						Matriz cofatores = new Matriz(getCofatores());
-						Matriz transposta = new Matriz(cofatores.getTransposta());
-						
-						for(int i = 0; i <  inversa.length; i++) {
-							for(int j = 0; j < inversa.length; j++) {
-								double valor = (1/det)*transposta.getIJ(i, j);
-								if(valor == -0)
-									inversa[i][j] = 0;
-								else
-									inversa[i][j] = valor;
-							}
+				det = getDeterminante(); 
+				inversa = new double[getNumLinhas()][getNumColunas()];
+				if(matriz.length == 2) {
+					double valor = matriz[1][1]/det;
+					
+					if(valor == -0)
+						inversa[0][0] = 0;
+					else
+						inversa[0][0] = matriz[1][1]/det;
+					
+					valor = matriz[0][0]/det;
+					if(valor == -0)
+						inversa[1][1] = 0;
+					else
+						inversa[1][1] = matriz[0][0]/det;
+					
+					valor = -matriz[0][1]/det;
+					if(valor == -0)
+						inversa[0][1] = 0;
+					else
+						inversa[0][1] = -matriz[0][1]/det;
+					
+					valor = -matriz[1][0]/det;
+					if(valor == -0)
+						inversa[1][0] = 0;
+					else
+						inversa[1][0] = -matriz[1][0]/det;	
+				}
+				else if(matriz.length == 3) {
+					Matriz cofatores = new Matriz(getCofatores());
+					Matriz transposta = new Matriz(cofatores.getTransposta());
+					
+					for(int i = 0; i <  inversa.length; i++) {
+						for(int j = 0; j < inversa.length; j++) {
+							double valor = (1/det)*transposta.getIJ(i, j);
+							if(valor == -0)
+								inversa[i][j] = 0;
+							else
+								inversa[i][j] = valor;
 						}
 					}
 				}

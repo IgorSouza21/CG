@@ -247,7 +247,7 @@ public class Operacoes {
 		t.v1 = vs[0];
 		t.v2 = vs[1];
 		t.v3 = vs[2];
-		
+		System.out.println("fez quicksort");
 		if(t.v2.y == t.v3.y) {
 			preencherTrianguloSuperior(t, t, k);
 		}
@@ -258,13 +258,25 @@ public class Operacoes {
 			Ponto p = new Ponto();
 			p.x = Math.floor((t.v1.x + ((t.v2.y - t.v1.y) / (t.v3.y - t.v1.y)) * (t.v3.x - t.v1.x) + 0.5));
 			p.y = t.v2.y;
-			
-			Triangulo um = t.copy();
+			Triangulo um, dois;
+			if(k == 0) {
+				um = new Triangulo();
+				um.v1 = t.v1;
+				um.v2 = t.v2;
+			}
+			else
+				um = t.copy();
 			um.v3 = p;
-			Triangulo dois = t.copy();
-			dois.v1 = t.v2;
+			if(k == 0) {
+				dois = new Triangulo();
+				dois.v1 = t.v2;
+				dois.v3 = t.v3;
+			}
+			else
+				dois = t.copy();
+			
 			dois.v2 = p;
-			dois.v3 = t.v3;
+			
  
 			preencherTrianguloSuperior(um, t, k);
 			preencherTrianguloInferior(dois, t, k);
@@ -442,15 +454,17 @@ public class Operacoes {
 		inicializarZBuffer(width, height);
 		
 		for (int i = 0; i < triangulosVista.length; i++) {
-			coordenadasTela(triangulosVista[i], width, height);
+			coordenadasTela(triangulosVista[i], width, height, 1);
+			System.out.println("chegou aqui: " + i);
 			Operacoes.scanLine(triangulosVista[i], 1);
+			System.out.println("fez scanline");
 		}
 		pintaZBuffer(canvas.getGraphicsContext2D());
 	}
 	
 	public static Ponto pOriginal(double[] coord, Triangulo t) {
 
-		Ponto r = Operacoes.coordenadaCartesianaBaricentrica(coord, t.v1, t.v2, t.v3);
+		Ponto r = Operacoes.coordenadaCartesianaBaricentrica(coord, t.p1Original, t.p2Original, t.p3Original);
 		Ponto pt = new Ponto();
 		pt.x = r.x;
 		pt.y = r.y;
@@ -460,21 +474,21 @@ public class Operacoes {
 	
 	public static Vetor calculaNormalPelaBaricentrica(Ponto p, Triangulo t, double[] coord) {
 		Vetor n1 = new Vetor();
-		n1.x = t.v1.x;
-		n1.y = t.v1.y;
-		n1.z = t.v1.z; 
+		n1.x = t.p1Original.normal.x;
+		n1.y = t.p1Original.normal.y;
+		n1.z = t.p1Original.normal.z; 
 		n1 = n1.multiplicarPorEscalar(coord[0]);
 		
 		Vetor n2 = new Vetor();
-		n2.x = t.v2.x;
-		n2.y = t.v2.y;
-		n2.z = t.v2.z; 
+		n2.x = t.p2Original.normal.x;
+		n2.y = t.p2Original.normal.y;
+		n2.z = t.p2Original.normal.z; 
 		n2 = n2.multiplicarPorEscalar(coord[1]);
 		
 		Vetor n3 = new Vetor();
-		n3.x = t.v3.x;
-		n3.y = t.v3.y;
-		n3.z = t.v3.z; 
+		n3.x = t.p3Original.normal.x;
+		n3.y = t.p3Original.normal.y;
+		n3.z = t.p3Original.normal.z; 
 		n3 = n3.multiplicarPorEscalar(coord[2]);
 
 		Vetor temp = Operacoes.somaVetores(n1, n2); 
@@ -515,9 +529,9 @@ public class Operacoes {
 	}
 	
 	public static void calcularNormaisVertices(Triangulo t, Triangulo[] T) {
-		t.v1.normal = calcularNormalVertice(t.p1Original, T);
-		t.v2.normal = calcularNormalVertice(t.p2Original, T);
-		t.v3.normal = calcularNormalVertice(t.p3Original, T);
+		t.p1Original.normal = calcularNormalVertice(t.p1Original, T);
+		t.p2Original.normal = calcularNormalVertice(t.p2Original, T);
+		t.p3Original.normal = calcularNormalVertice(t.p3Original, T);
 	}
 	
 	public static Vetor luzAmbiente() {
@@ -757,18 +771,31 @@ public class Operacoes {
 		r.close();
 	}
 	
-	public static void coordenadasTela(Triangulo t, int width, int height) {
-		t.v1 = Operacoes.getProjecaoPerspectiva(t.v1);
-		t.v2 = Operacoes.getProjecaoPerspectiva(t.v2);
-		t.v3 =	Operacoes.getProjecaoPerspectiva(t.v3);
+	public static void coordenadasTela(Triangulo t, int width, int height, int k) {
+		Triangulo c;
+		if(k == 0) {
+			c = new Triangulo();
+			c.v1 = t.v1;
+			c.v2 = t.v2;
+			c.v3 = t.v3;
+		}
+		else
+			c = t.copy();
+		c.v1 = Operacoes.getProjecaoPerspectiva(c.v1);
+		c.v2 = Operacoes.getProjecaoPerspectiva(c.v2);
+		c.v3 =	Operacoes.getProjecaoPerspectiva(c.v3);
 		
-		t.v1 = Operacoes.getCoordenadasNormalizadas(t.v1);
-		t.v2 = Operacoes.getCoordenadasNormalizadas(t.v2);
-		t.v3 =	Operacoes.getCoordenadasNormalizadas(t.v3);
+		c.v1 = Operacoes.getCoordenadasNormalizadas(c.v1);
+		c.v2 = Operacoes.getCoordenadasNormalizadas(c.v2);
+		c.v3 =	Operacoes.getCoordenadasNormalizadas(c.v3);
 		
-		t.v1 = Operacoes.getCoordenadasTela(width, height, t.v1);
-		t.v2 = Operacoes.getCoordenadasTela(width, height, t.v2);
-		t.v3 = Operacoes.getCoordenadasTela(width, height, t.v3);
+		c.v1 = Operacoes.getCoordenadasTela(width, height, c.v1);
+		c.v2 = Operacoes.getCoordenadasTela(width, height, c.v2);
+		c.v3 = Operacoes.getCoordenadasTela(width, height, c.v3);
+		
+		t.v1 = c.v1;
+		t.v2 = c.v2;
+		t.v3 = c.v3;
 	}
 
 	public static void pintaZBuffer(GraphicsContext gc) {
@@ -827,7 +854,7 @@ public class Operacoes {
 		      pTela[i].v2 = getCoordenadasVista(U, V, N, triangulos[i].v2);
 		      pTela[i].v3 = getCoordenadasVista(U, V, N, triangulos[i].v3);
 		      
-		      coordenadasTela(pTela[i], width, height);
+		      coordenadasTela(pTela[i], width, height, 0);
 		 
 		      scanLine(pTela[i], 0);
 		 
