@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
+   <children>
+      <MenuBar layoutY="2.0" prefHeight="24.0" prefWidth="971.0" AnchorPane.bottomAnchor="562.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="Telas">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#questao1" text="Questão 1" />
+              <MenuItem mnemonicParsing="false" onAction="#questao2" text="Questão 2" />
+                  <MenuItem mnemonicParsing="false" onAction="#projecaoPerspectiva" text="Projeção em Perspectiva" />
+                  <MenuItem mnemonicParsing="false" onAction="#scanLine" text="ScanLineConversion" />
+                  <MenuItem mnemonicParsing="false" onAction="#iluminacao" text="Iluminação" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <HBox layoutY="32.0" prefHeight="629.0" prefWidth="788.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
+         <children>
+            <VBox prefHeight="693.0" prefWidth="966.0">
+               <children>
+                  <HBox prefHeight="504.0" prefWidth="847.0">
+                     <children>
+                        <VBox prefHeight="408.0" prefWidth="220.0" spacing="5.0">
+                           <children>
+                              <StackPane>
+                                 <children>
+                                    <Label text="Câmera Virtual">
+                                       <font>
+                                          <Font name="Bell MT" size="25.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </StackPane>
+                              <Label text="Ponto C" />
+                              <HBox prefHeight="29.0" prefWidth="143.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="Cx" />
+                                    <TextField fx:id="Cy" />
+                                    <TextField fx:id="Cz" />
+                                 </children>
+                              </HBox>
+                              <Label text="V" />
+                              <HBox prefHeight="29.0" prefWidth="162.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="Vx" />
+                                    <TextField fx:id="Vy" />
+                                    <TextField fx:id="Vz" />
+                                 </children>
+                              </HBox>
+                              <Label text="N" />
+                              <HBox prefHeight="29.0" prefWidth="162.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="Nx" />
+                                    <TextField fx:id="Ny" />
+                                    <TextField fx:id="Nz" />
+                                 </children>
+                              </HBox>
+                              <Label text="D" />
+                              <TextField fx:id="D" />
+                              <Label text="Hx" />
+                              <TextField fx:id="Hx" />
+                              <Label text="Hy" />
+                              <TextField fx:id="Hy" />
+                              <Label text="Imagem" />
+                              <ComboBox fx:id="imagem" prefHeight="25.0" prefWidth="196.0" />
+                           </children>
+                           <padding>
+                              <Insets right="10.0" top="20.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets right="-50.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <Pane prefHeight="500.0" prefWidth="500.0">
+                           <HBox.margin>
+                              <Insets left="50.0" />
+                           </HBox.margin>
+                           <children>
+                              <Canvas fx:id="canvas" height="500.0" width="500.0" />
+                              <TextArea fx:id="questao1" editable="false" prefHeight="500.0" prefWidth="500.0" visible="false" />
+                           </children>
+                        </Pane>
+                        <VBox prefHeight="408.0" prefWidth="220.0" spacing="5.0">
+                           <children>
+                              <StackPane>
+                                 <children>
+                                    <Label text="Iluminação">
+                                       <font>
+                                          <Font name="Bell MT" size="25.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </StackPane>
+                              <Label text="Iamb" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="IambR" />
+                                    <TextField fx:id="IambG" />
+                                    <TextField fx:id="IambB" />
+                                 </children>
+                              </HBox>
+                              <Label text="Ka" />
+                              <TextField fx:id="Ka" />
+                              <Label text="Il" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="IlR" />
+                                    <TextField fx:id="IlG" />
+                                    <TextField fx:id="IlB" />
+                                 </children>
+                              </HBox>
+                              <Label text="Pl" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="PlX" />
+                                    <TextField fx:id="PlY" />
+                                    <TextField fx:id="PlZ" />
+                                 </children>
+                              </HBox>
+                              <Label text="Kd" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="KdR" />
+                                    <TextField fx:id="KdG" />
+                                    <TextField fx:id="KdB" />
+                                 </children>
+                              </HBox>
+                              <Label text="Od" />
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="OdR" />
+                                    <TextField fx:id="OdG" />
+                                    <TextField fx:id="OdB" />
+                                 </children>
+                              </HBox>
+                              <Label text="Ks" />
+                              <TextField fx:id="Ks" />
+                              <Label text="Eta" />
+                              <TextField fx:id="Eta" />
+                           </children>
+                           <padding>
+                              <Insets top="20.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <StackPane>
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#handleCarregar" text="Carregar" />
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </HBox>
+   </children>
+</AnchorPane>
