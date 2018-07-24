@@ -334,7 +334,8 @@ public class TelaController extends Application implements Initializable{
 	}
 	
 	
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
+		System.out.println("comecou");
 		launch(args);
 	}
 

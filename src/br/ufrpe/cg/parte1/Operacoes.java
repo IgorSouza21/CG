@@ -3,6 +3,7 @@ package br.ufrpe.cg.parte1;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import br.ufrpe.cg.beans.CameraVirtual;
 import br.ufrpe.cg.beans.Iluminacao;
@@ -18,7 +19,6 @@ import javafx.scene.paint.Color;
 public class Operacoes {
 	public static Ponto[] pontos;
 	public static Triangulo[] triangulos;
-	public static Triangulo[] triangulosVista;
 	public static Z[][] zBuffer;
 	public static Canvas canvas;
 
@@ -70,9 +70,25 @@ public class Operacoes {
 	
 	public static Vetor produtoVetorial(Vetor a, Vetor b) {
 		Vetor c = new Vetor();
-		c.x = a.y*b.z - a.z*b.y;
-		c.y = a.z*b.x - a.x*b.z;
-		c.z = a.x*b.y - a.y*b.x;
+		Matriz aux = new Matriz(3, 3);
+	
+		aux.setIJ(0, 0, 1);
+		aux.setIJ(0, 1, 1);
+		aux.setIJ(0, 2, 1);
+		aux.setIJ(1, 0, a.x);
+		aux.setIJ(1, 1, a.y);
+		aux.setIJ(1, 2, a.z);
+		aux.setIJ(2, 0, b.x);
+		aux.setIJ(2, 1, b.y);
+		aux.setIJ(2, 2, b.z);
+		
+		c.x = aux.getIJ(0, 0) * aux.getIJ(1, 1) * aux.getIJ(2, 2)
+				- (aux.getIJ(0, 0) * aux.getIJ(1, 2) * aux.getIJ(2, 1));
+		c.y = aux.getIJ(0, 1) * aux.getIJ(1, 2) * aux.getIJ(2, 0)
+				- (aux.getIJ(0, 1) * aux.getIJ(1, 0) * aux.getIJ(2, 2));
+		
+		c.z = aux.getIJ(0, 2) * aux.getIJ(1, 0) * aux.getIJ(2, 1)
+				- (aux.getIJ(0, 2) * aux.getIJ(1, 1) * aux.getIJ(2, 0));
 		
 		return c;
 	}
@@ -147,9 +163,7 @@ public class Operacoes {
 				linha = reader.readLine();
 				nk = linha.split(" ");
 				t[i] = new Triangulo(p[Integer.parseInt(nk[0])-1], p[Integer.parseInt(nk[1])-1], p[Integer.parseInt(nk[2])-1]);
-				p[Integer.parseInt(nk[0])-1].triangulos.add(i);
-				p[Integer.parseInt(nk[1])-1].triangulos.add(i);
-				p[Integer.parseInt(nk[2])-1].triangulos.add(i);
+				
 				t[i].p1Original = p[Integer.parseInt(nk[0])-1];
 				t[i].p2Original = p[Integer.parseInt(nk[1])-1];
 				t[i].p3Original = p[Integer.parseInt(nk[2])-1];
@@ -197,7 +211,7 @@ public class Operacoes {
 		A.setIJ(2, 1, N.y);
 		A.setIJ(2, 2, N.z);
 		
-		Vetor temp = Operacoes.subtrairPontos(m, CameraVirtual.C);
+		Vetor temp = Operacoes.subtrairPontos(CameraVirtual.C, m);
 		Matriz B = new Matriz(3, 1);
 		B.setIJ(0, 0, temp.x);
 		B.setIJ(1, 0, temp.y);
@@ -242,12 +256,14 @@ public class Operacoes {
 	}
 	
 	public static void scanLine(Triangulo t, int k) {
+		t.certo1 = t.v1;
+		t.certo2 = t.v2;
+		t.certo3 = t.v3;
 		Ponto[] vs = new Ponto[]{t.v1,t.v2,t.v3};
 		quickSort(vs, 0, 2, 0);
 		t.v1 = vs[0];
 		t.v2 = vs[1];
 		t.v3 = vs[2];
-		System.out.println("fez quicksort");
 		if(t.v2.y == t.v3.y) {
 			preencherTrianguloSuperior(t, t, k);
 		}
@@ -258,24 +274,16 @@ public class Operacoes {
 			Ponto p = new Ponto();
 			p.x = Math.floor((t.v1.x + ((t.v2.y - t.v1.y) / (t.v3.y - t.v1.y)) * (t.v3.x - t.v1.x) + 0.5));
 			p.y = t.v2.y;
-			Triangulo um, dois;
-			if(k == 0) {
-				um = new Triangulo();
-				um.v1 = t.v1;
-				um.v2 = t.v2;
-			}
-			else
-				um = t.copy();
-			um.v3 = p;
-			if(k == 0) {
-				dois = new Triangulo();
-				dois.v1 = t.v2;
-				dois.v3 = t.v3;
-			}
-			else
-				dois = t.copy();
 			
+			Triangulo um, dois;
+			um = t.copy();
+			um.v3 = p;
+			
+			dois = t.copy();
+			dois.v1 = t.v2;
 			dois.v2 = p;
+			dois.v3 = t.v3;
+			
 			
  
 			preencherTrianguloSuperior(um, t, k);
@@ -436,59 +444,45 @@ public class Operacoes {
 		Vetor N = Operacoes.normalizar(CameraVirtual.N);
 		Vetor U = Operacoes.obterU(N, V);
 		
-		triangulosVista = new Triangulo[triangulos.length];
 		for(int i = 0; i < triangulos.length; i++) {
-			triangulosVista[i] = triangulos[i].copy();
-			triangulosVista[i].v1 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v1);
-			triangulosVista[i].v2 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v2);
-			triangulosVista[i].v3 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v3);
-			triangulosVista[i].normalTriangulo();
+			triangulos[i].vista1 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v1);
+			triangulos[i].vista2 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v2);
+			triangulos[i].vista3 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v3);
+			triangulos[i].normalTriangulo();
 		}
 		
-		for(int i = 0; i < triangulosVista.length; i++) {
-			calcularNormaisVertices(triangulosVista[i], triangulosVista);
-		}
 		
-		Operacoes.quickSort(triangulosVista, 0, triangulosVista.length-1, 1);
+		calcularNormaisVertices();
+		
+		Operacoes.quickSort(triangulos, 0, triangulos.length-1, 1);
 		
 		inicializarZBuffer(width, height);
 		
-		for (int i = 0; i < triangulosVista.length; i++) {
-			coordenadasTela(triangulosVista[i], width, height, 1);
-			System.out.println("chegou aqui: " + i);
-			Operacoes.scanLine(triangulosVista[i], 1);
-			System.out.println("fez scanline");
+		for (int i = 0; i < triangulos.length; i++) {
+			coordenadasTela(triangulos[i], width, height);
+			//System.out.println("chegou aqui: " + i);
+			Operacoes.scanLine(triangulos[i], 1);
 		}
 		pintaZBuffer(canvas.getGraphicsContext2D());
 	}
 	
 	public static Ponto pOriginal(double[] coord, Triangulo t) {
 
-		Ponto r = Operacoes.coordenadaCartesianaBaricentrica(coord, t.p1Original, t.p2Original, t.p3Original);
-		Ponto pt = new Ponto();
-		pt.x = r.x;
-		pt.y = r.y;
-		pt.z = r.z;
-		return pt;
+		Ponto r = Operacoes.coordenadaCartesianaBaricentrica(coord, t.vista1, t.vista2, t.vista3);
+		return r;
 	}
 	
 	public static Vetor calculaNormalPelaBaricentrica(Ponto p, Triangulo t, double[] coord) {
 		Vetor n1 = new Vetor();
-		n1.x = t.p1Original.normal.x;
-		n1.y = t.p1Original.normal.y;
-		n1.z = t.p1Original.normal.z; 
+		n1 = t.p1Original.normal;
 		n1 = n1.multiplicarPorEscalar(coord[0]);
 		
 		Vetor n2 = new Vetor();
-		n2.x = t.p2Original.normal.x;
-		n2.y = t.p2Original.normal.y;
-		n2.z = t.p2Original.normal.z; 
+		n2 = t.p2Original.normal; 
 		n2 = n2.multiplicarPorEscalar(coord[1]);
 		
 		Vetor n3 = new Vetor();
-		n3.x = t.p3Original.normal.x;
-		n3.y = t.p3Original.normal.y;
-		n3.z = t.p3Original.normal.z; 
+		n3 = t.p3Original.normal;
 		n3 = n3.multiplicarPorEscalar(coord[2]);
 
 		Vetor temp = Operacoes.somaVetores(n1, n2); 
@@ -504,7 +498,15 @@ public class Operacoes {
 	}
 	
 	public static void calcularCor(int x, int y, Triangulo t) {
-		double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.v1, t.v2, t.v3);
+		if(x > 499)
+			x = 499;
+		if(x < 0)
+			x = 0;
+		if(y > 499)
+			y = 499;
+		if(y < 0)
+			y = 0;
+		double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.certo1, t.certo2, t.certo3);
 		
 		Ponto p = pOriginal(coord, t);
 		if(p.z > zBuffer[x][y].z) {
@@ -513,14 +515,25 @@ public class Operacoes {
 			Vetor L = Operacoes.encontrarL(p);
 			Vetor R = Operacoes.encontrarR(N, L);
 			Vetor cor = Operacoes.iluminacaoPhong(N, V, L, R);
-			zBuffer[x][y].c = Color.color(cor.x, cor.y, cor.z);
+			zBuffer[x][y].c = Color.rgb((int) cor.x, (int) cor.y, (int) cor.z);
 		}
 	}
 	
-	public static Vetor calcularNormalVertice(Ponto v,Triangulo[] T) {
+	public static ArrayList<Triangulo> retornaTriangulos(Ponto p, Triangulo[] t) {
+		ArrayList<Triangulo> lista = new ArrayList<>();
+		for (int i = 0; i < t.length; i++) {
+			if(t[i].p1Original == p || t[i].p2Original == p || t[i].p3Original == p)
+				lista.add(t[i]);
+		}
+		
+		return lista;
+	}
+	
+	public static Vetor calcularNormalVertice(Ponto v) {
 		Vetor normal = new Vetor();
-		for(int i= 0; i < v.triangulos.size(); i++) {
-			normal = Operacoes.somaVetores(normal, T[v.triangulos.get(i)].normal);
+		ArrayList<Triangulo> l = retornaTriangulos(v, triangulos);
+		for(int i= 0; i < l.size(); i++) {
+			normal = Operacoes.somaVetores(normal, l.get(i).normal);
 		}
 		
 		normal = Operacoes.normalizar(normal);
@@ -528,10 +541,11 @@ public class Operacoes {
 		
 	}
 	
-	public static void calcularNormaisVertices(Triangulo t, Triangulo[] T) {
-		t.p1Original.normal = calcularNormalVertice(t.p1Original, T);
-		t.p2Original.normal = calcularNormalVertice(t.p2Original, T);
-		t.p3Original.normal = calcularNormalVertice(t.p3Original, T);
+	public static void calcularNormaisVertices() {
+		for (int i = 0; i < pontos.length; i++) {
+			pontos[i].normal = calcularNormalVertice(pontos[i]);
+		}
+
 	}
 	
 	public static Vetor luzAmbiente() {
@@ -631,7 +645,7 @@ public class Operacoes {
 	}
 	
 	public static Vetor encontrarL(Ponto p) {
-		return Operacoes.normalizar(Operacoes.subtrairPontos(Iluminacao.Pl, p));
+		return Operacoes.normalizar(Operacoes.subtrairPontos(p, Iluminacao.Pl));
 		
 	}
 	
@@ -686,35 +700,12 @@ public class Operacoes {
 			}
 			
 		}
-		Vetor x = new Vetor();
-		x.x = v[0];
-		x.y = v[1];
-		x.z = v[2];
-		Iluminacao.Iamb = x;
-		
+		Iluminacao.Iamb = new Vetor(v[0], v[1], v[2]);
 		Iluminacao.Ka = v[3];
-		
-		x.x = v[4];
-		x.y = v[5];
-		x.z = v[6];
-		Iluminacao.Il = x;
-		
-		Ponto y = new Ponto();
-		y.x = v[7];
-		y.y = v[8];
-		y.z = v[9];
-		Iluminacao.Pl = y;
-		
-		x.x = v[10];
-		x.y = v[11];
-		x.z = v[12];
-		Iluminacao.Kd = x;
-		
-		x.x = v[13];
-		x.y = v[14];
-		x.z = v[15];
-		Iluminacao.Od = x;
-		
+		Iluminacao.Il = new Vetor(v[4], v[5], v[6]);
+		Iluminacao.Pl = new Ponto(v[7],v[8],v[9]);
+		Iluminacao.Kd = new Vetor(v[10],v[11],v[12]);
+		Iluminacao.Od = new Vetor(v[13],v[14],v[15]);
 		Iluminacao.Ks = v[16];
 		Iluminacao.Eta = v[17];
 		
@@ -746,56 +737,34 @@ public class Operacoes {
 			}
 			
 		}
-		Vetor x = new Vetor();
-		x.x = v[0];
-		x.y = v[1];
-		x.z = v[2];
-		CameraVirtual.N = x;
-		
-		x = new Vetor();
-		x.x = v[3];
-		x.y = v[4];
-		x.z = v[5];
-		CameraVirtual.V = x;
-		
+		CameraVirtual.N = new Vetor(v[0],v[1],v[2]);
+		CameraVirtual.V = new Vetor(v[3],v[4],v[5]);
 		CameraVirtual.D = v[6];
 		CameraVirtual.Hx = v[7];
 		CameraVirtual.Hy = v[8];
-		
-		Ponto y = new Ponto();
-		y.x = v[9];
-		y.y = v[10];
-		y.z = v[11];
-		CameraVirtual.C = y;
+
+		CameraVirtual.C = new Ponto(v[9], v[10], v[11]);
 		
 		r.close();
 	}
 	
-	public static void coordenadasTela(Triangulo t, int width, int height, int k) {
-		Triangulo c;
-		if(k == 0) {
-			c = new Triangulo();
-			c.v1 = t.v1;
-			c.v2 = t.v2;
-			c.v3 = t.v3;
-		}
-		else
-			c = t.copy();
-		c.v1 = Operacoes.getProjecaoPerspectiva(c.v1);
-		c.v2 = Operacoes.getProjecaoPerspectiva(c.v2);
-		c.v3 =	Operacoes.getProjecaoPerspectiva(c.v3);
+	public static void coordenadasTela(Triangulo t, int width, int height) {
+	
+		t.v1 = Operacoes.getProjecaoPerspectiva(t.vista1);
+		t.v2 = Operacoes.getProjecaoPerspectiva(t.vista2);
+		t.v3 =	Operacoes.getProjecaoPerspectiva(t.vista3);
 		
-		c.v1 = Operacoes.getCoordenadasNormalizadas(c.v1);
-		c.v2 = Operacoes.getCoordenadasNormalizadas(c.v2);
-		c.v3 =	Operacoes.getCoordenadasNormalizadas(c.v3);
+		t.v1 = Operacoes.getCoordenadasNormalizadas(t.v1);
+		t.v2 = Operacoes.getCoordenadasNormalizadas(t.v2);
+		t.v3 =	Operacoes.getCoordenadasNormalizadas(t.v3);
 		
-		c.v1 = Operacoes.getCoordenadasTela(width, height, c.v1);
-		c.v2 = Operacoes.getCoordenadasTela(width, height, c.v2);
-		c.v3 = Operacoes.getCoordenadasTela(width, height, c.v3);
+		t.v1 = Operacoes.getCoordenadasTela(width, height, t.v1);
+		t.v2 = Operacoes.getCoordenadasTela(width, height, t.v2);
+		t.v3 = Operacoes.getCoordenadasTela(width, height, t.v3);
 		
-		t.v1 = c.v1;
-		t.v2 = c.v2;
-		t.v3 = c.v3;
+		t.v1 = t.v1;
+		t.v2 = t.v2;
+		t.v3 = t.v3;
 	}
 
 	public static void pintaZBuffer(GraphicsContext gc) {
@@ -837,7 +806,7 @@ public class Operacoes {
 	 
 	}
 	
-	 public static Canvas pintaScanLine(GraphicsContext gc, int width, int height, String s) throws Exception{
+	public static Canvas pintaScanLine(GraphicsContext gc, int width, int height, String s) throws Exception{
 		Operacoes.carregarPontosTriangulos(s);
 		Operacoes.carregarParametrosCamera();
 		   
@@ -854,7 +823,7 @@ public class Operacoes {
 		      pTela[i].v2 = getCoordenadasVista(U, V, N, triangulos[i].v2);
 		      pTela[i].v3 = getCoordenadasVista(U, V, N, triangulos[i].v3);
 		      
-		      coordenadasTela(pTela[i], width, height, 0);
+		      coordenadasTela(pTela[i], width, height);
 		 
 		      scanLine(pTela[i], 0);
 		 

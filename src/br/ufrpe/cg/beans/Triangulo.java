@@ -10,6 +10,12 @@ public class Triangulo {
 	public Ponto p1Original;
 	public Ponto p2Original;
 	public Ponto p3Original;
+	public Ponto certo1;
+	public Ponto certo2;
+	public Ponto certo3;
+	public Ponto vista1;
+	public Ponto vista2;
+	public Ponto vista3;
 	
 	public Triangulo() {
 		normal = new Vetor();
@@ -31,9 +37,16 @@ public class Triangulo {
 	}
 
 	public void normalTriangulo() {
-		Vetor temp = Operacoes.subtrairPontos(v2, v1);
-		Vetor temp1 = Operacoes.subtrairPontos(v3, v1);
-		normal = Operacoes.normalizar(Operacoes.produtoVetorial(temp, temp1));
+		Vetor temp = Operacoes.subtrairPontos(v1, v2);
+		System.out.println(temp);
+		Vetor temp1 = Operacoes.subtrairPontos(v1, v3);
+		System.out.println(temp1);
+		normal = Operacoes.produtoVetorial(temp, temp1);
+		System.out.println(normal);
+		normal.x = -normal.x;
+		normal.y = -normal.y;
+		normal.z = -normal.z;
+		normal = Operacoes.normalizar(normal);
 	}
 	
 	public Triangulo copy() {
@@ -41,10 +54,13 @@ public class Triangulo {
 		t.v1 = v1.copy();
 		t.v2 = v2.copy();
 		t.v3 = v3.copy();
-		t.normal = normal;
-		t.p1Original = p1Original.copy();
-		t.p2Original = p2Original.copy();
-		t.p3Original = p3Original.copy();
+		if(normal != null)
+			t.normal = normal;
+		if(p1Original != null && p2Original != null && p3Original != null) {
+			t.p1Original = p1Original.copy();
+			t.p2Original = p2Original.copy();
+			t.p3Original = p3Original.copy();
+		}
 		
 		return t;
 	}

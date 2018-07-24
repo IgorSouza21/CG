@@ -30,6 +30,13 @@ public class Vetor {
 		
 		return a;
 	}
+
+	@Override
+	public String toString() {
+		return "Vetor [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+	
+	
 	
 	
 
