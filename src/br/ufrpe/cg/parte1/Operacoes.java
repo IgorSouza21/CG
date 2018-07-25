@@ -472,7 +472,7 @@ public class Operacoes {
 		return r;
 	}
 	
-	public static Vetor calculaNormalPelaBaricentrica(Ponto p, Triangulo t, double[] coord) {
+	public static Vetor calculaNormalPelaBaricentrica(Triangulo t, double[] coord) {
 		Vetor n1 = new Vetor();
 		n1 = t.p1Original.normal;
 		n1 = n1.multiplicarPorEscalar(coord[0]);
@@ -498,24 +498,33 @@ public class Operacoes {
 	}
 	
 	public static void calcularCor(int x, int y, Triangulo t) {
-		if(x > 499)
-			x = 499;
-		if(x < 0)
-			x = 0;
-		if(y > 499)
-			y = 499;
-		if(y < 0)
-			y = 0;
-		double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.certo1, t.certo2, t.certo3);
-		
-		Ponto p = pOriginal(coord, t);
-		if(p.z > zBuffer[x][y].z) {
-			Vetor N = calculaNormalPelaBaricentrica(p, t, coord);
-			Vetor V = Operacoes.encontrarV(p);
-			Vetor L = Operacoes.encontrarL(p);
-			Vetor R = Operacoes.encontrarR(N, L);
-			Vetor cor = Operacoes.iluminacaoPhong(N, V, L, R);
-			zBuffer[x][y].c = Color.rgb((int) cor.x, (int) cor.y, (int) cor.z);
+		if(!(x > 499 || x < 0 || y > 499 || y < 0)) {
+			double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.certo1, t.certo2, t.certo3);
+			
+			Ponto p = pOriginal(coord, t);
+			if(p.z > zBuffer[x][y].z) {
+				Vetor N = calculaNormalPelaBaricentrica(t, coord);
+				Vetor V = Operacoes.encontrarV(p);
+				Vetor L = Operacoes.encontrarL(p);
+				Vetor R = Operacoes.encontrarR(N, L);
+				Vetor cor = Operacoes.iluminacaoPhong(N, V, L, R);
+				double r = Math.floor(cor.x + 0.5);
+				double g = Math.floor(cor.y + 0.5);
+				double b = Math.floor(cor.z + 0.5);
+				if(r > 255)
+					r = 255;
+				if(r < 0)
+					r = 0;
+				if(g > 255)
+					g = 255;
+				if(g < 0)
+					g = 0;
+				if(b > 255)
+					b = 255;
+				if(b < 0)
+					b = 0;
+				zBuffer[x][y].c = Color.rgb((int) r, (int) g, (int) b);
+			}
 		}
 	}
 	
@@ -594,12 +603,6 @@ public class Operacoes {
 				N.z = -N.z;
 			}
 			else {
-				if(Ia.x > 255)
-					Ia.x = 255;
-				if(Ia.y > 255)
-					Ia.y = 255;
-				if(Ia.z > 255)
-					Ia.z = 255;
 				return Ia;
 			}
 		}
@@ -610,12 +613,6 @@ public class Operacoes {
 			Vetor I = new Vetor();
 			I = Operacoes.somaVetores(Ia, Id);
 			
-			if(I.x > 255)
-				I.x = 255;
-			if(I.y > 255)
-				I.y = 255;
-			if(I.z > 255)
-				I.z = 255;
 			return I;
 		}
 		
@@ -624,13 +621,6 @@ public class Operacoes {
 		Vetor I = new Vetor();
 		I = Operacoes.somaVetores(Ia, Id);
 		I = Operacoes.somaVetores(I, Is);
-		
-		if(I.x > 255)
-			I.x = 255;
-		if(I.y > 255)
-			I.y = 255;
-		if(I.z > 255)
-			I.z = 255;
 		
 		return I;	
 	}

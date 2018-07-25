@@ -37,15 +37,9 @@ public class Triangulo {
 	}
 
 	public void normalTriangulo() {
-		Vetor temp = Operacoes.subtrairPontos(v1, v2);
-		System.out.println(temp);
-		Vetor temp1 = Operacoes.subtrairPontos(v1, v3);
-		System.out.println(temp1);
+		Vetor temp = Operacoes.subtrairPontos(vista1, vista2);
+		Vetor temp1 = Operacoes.subtrairPontos(vista1, vista3);
 		normal = Operacoes.produtoVetorial(temp, temp1);
-		System.out.println(normal);
-		normal.x = -normal.x;
-		normal.y = -normal.y;
-		normal.z = -normal.z;
 		normal = Operacoes.normalizar(normal);
 	}
 	
