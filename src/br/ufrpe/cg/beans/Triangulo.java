@@ -16,6 +16,7 @@ public class Triangulo {
 	public Ponto vista1;
 	public Ponto vista2;
 	public Ponto vista3;
+	public Ponto baricentro;
 	
 	public Triangulo() {
 		normal = new Vetor();
@@ -27,8 +28,11 @@ public class Triangulo {
 		v3 = p3;
 	}
 	
-	public double calcularBaricentro() {
-		return (v1.z + v2.z + v3.z) / 3;
+	public void calcularBaricentro() {
+		baricentro = new Ponto();
+		baricentro.x = (vista1.x + vista2.x + vista3.x) / 3;
+		baricentro.y = (vista1.y + vista2.y + vista3.y) / 3;
+		baricentro.z = (vista1.z + vista2.z + vista3.z) / 3;
 	}
 	
 	@Override
@@ -37,9 +41,12 @@ public class Triangulo {
 	}
 
 	public void normalTriangulo() {
-		Vetor temp = Operacoes.subtrairPontos(vista1, vista2);
-		Vetor temp1 = Operacoes.subtrairPontos(vista1, vista3);
+		Vetor temp = Operacoes.subtrairPontos(vista2, vista1);
+		Vetor temp1 = Operacoes.subtrairPontos(vista3, vista1);
 		normal = Operacoes.produtoVetorial(temp, temp1);
+		normal.x = -normal.x;
+		normal.y = -normal.y;
+		normal.z = -normal.z;
 		normal = Operacoes.normalizar(normal);
 	}
 	

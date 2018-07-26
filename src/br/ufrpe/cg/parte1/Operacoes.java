@@ -55,9 +55,9 @@ public class Operacoes {
 	
 	public static Vetor subtrairPontos(Ponto a, Ponto b) {
 		Vetor c = new Vetor();
-		c.x = b.x - a.x;
-		c.y = b.y - a.y;
-		c.z = b.z - a.z;
+		c.x = a.x - b.x;
+		c.y = a.y - b.y;
+		c.z = a.z - b.z;
 				
 		return c;
 	}
@@ -70,26 +70,11 @@ public class Operacoes {
 	
 	public static Vetor produtoVetorial(Vetor a, Vetor b) {
 		Vetor c = new Vetor();
-		Matriz aux = new Matriz(3, 3);
+		
+		c.x = a.y*b.z - a.z*b.y;
+		c.y = a.z*b.x - a.x*b.z;
+		c.z = a.x*b.y - a.y*b.x;
 	
-		aux.setIJ(0, 0, 1);
-		aux.setIJ(0, 1, 1);
-		aux.setIJ(0, 2, 1);
-		aux.setIJ(1, 0, a.x);
-		aux.setIJ(1, 1, a.y);
-		aux.setIJ(1, 2, a.z);
-		aux.setIJ(2, 0, b.x);
-		aux.setIJ(2, 1, b.y);
-		aux.setIJ(2, 2, b.z);
-		
-		c.x = aux.getIJ(0, 0) * aux.getIJ(1, 1) * aux.getIJ(2, 2)
-				- (aux.getIJ(0, 0) * aux.getIJ(1, 2) * aux.getIJ(2, 1));
-		c.y = aux.getIJ(0, 1) * aux.getIJ(1, 2) * aux.getIJ(2, 0)
-				- (aux.getIJ(0, 1) * aux.getIJ(1, 0) * aux.getIJ(2, 2));
-		
-		c.z = aux.getIJ(0, 2) * aux.getIJ(1, 0) * aux.getIJ(2, 1)
-				- (aux.getIJ(0, 2) * aux.getIJ(1, 1) * aux.getIJ(2, 0));
-		
 		return c;
 	}
 	
@@ -211,7 +196,7 @@ public class Operacoes {
 		A.setIJ(2, 1, N.y);
 		A.setIJ(2, 2, N.z);
 		
-		Vetor temp = Operacoes.subtrairPontos(CameraVirtual.C, m);
+		Vetor temp = Operacoes.subtrairPontos(m, CameraVirtual.C);
 		Matriz B = new Matriz(3, 1);
 		B.setIJ(0, 0, temp.x);
 		B.setIJ(1, 0, temp.y);
@@ -375,10 +360,10 @@ public class Operacoes {
 		if(a instanceof Triangulo[]) {
 			A = (Triangulo[]) a;
 			int i = p - 1;
-			double z = A[r].calcularBaricentro();
+			double z = A[r].baricentro.z;
 			int j;
 			for(j = p; j <= r-1; j++){
-				if(A[j].calcularBaricentro() <= z){
+				if(A[j].baricentro.z >= z){
 					i++;
 					Triangulo temp;
 					temp = A[i];
@@ -425,7 +410,7 @@ public class Operacoes {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				zBuffer[i][j] = new Z();
-				zBuffer[i][j].z = Double.NEGATIVE_INFINITY;
+				zBuffer[i][j].z = Double.POSITIVE_INFINITY;
 				zBuffer[i][j].c = Color.BLACK;
 			}
 		}
@@ -449,6 +434,7 @@ public class Operacoes {
 			triangulos[i].vista2 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v2);
 			triangulos[i].vista3 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v3);
 			triangulos[i].normalTriangulo();
+			triangulos[i].calcularBaricentro();
 		}
 		
 		
@@ -459,8 +445,7 @@ public class Operacoes {
 		inicializarZBuffer(width, height);
 		
 		for (int i = 0; i < triangulos.length; i++) {
-			coordenadasTela(triangulos[i], width, height);
-			//System.out.println("chegou aqui: " + i);
+			coordenadasTelaIluminacao(triangulos[i], width, height);
 			Operacoes.scanLine(triangulos[i], 1);
 		}
 		pintaZBuffer(canvas.getGraphicsContext2D());
@@ -502,7 +487,7 @@ public class Operacoes {
 			double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.certo1, t.certo2, t.certo3);
 			
 			Ponto p = pOriginal(coord, t);
-			if(p.z > zBuffer[x][y].z) {
+			if(p.z < zBuffer[x][y].z) {
 				Vetor N = calculaNormalPelaBaricentrica(t, coord);
 				Vetor V = Operacoes.encontrarV(p);
 				Vetor L = Operacoes.encontrarL(p);
@@ -595,7 +580,9 @@ public class Operacoes {
 	
 	public static Vetor iluminacaoPhong(Vetor N, Vetor V, Vetor L, Vetor R) {
 		Vetor Ia = luzAmbiente();
-		
+		Vetor Id = null;
+		Vetor Is = null;
+
 		if(Operacoes.produtoEscalar(N,L) < 0) {
 			if(Operacoes.produtoEscalar(V,N) < 0) {
 				N.x = -N.x;
@@ -603,23 +590,24 @@ public class Operacoes {
 				N.z = -N.z;
 			}
 			else {
-				return Ia;
+				Id = new Vetor(0,0,0);
+				Is = new Vetor(0,0,0);
 			}
 		}
 		
-		Vetor Id = reflexaoDifusa(N, V, L);
-	
 		if(Operacoes.produtoEscalar(V, R) < 0) {
-			Vetor I = new Vetor();
-			I = Operacoes.somaVetores(Ia, Id);
-			
-			return I;
+			Is = new Vetor(0,0,0);
 		}
 		
-		Vetor Is = reflexaoEspecular(R, V);
+		if(Id == null) {
+			Id = reflexaoDifusa(N, V, L);
+		}
+		if(Is == null) {
+			Is = reflexaoEspecular(R, V);
+		}
 		
-		Vetor I = new Vetor();
-		I = Operacoes.somaVetores(Ia, Id);
+		
+		Vetor I = Operacoes.somaVetores(Ia, Id);
 		I = Operacoes.somaVetores(I, Is);
 		
 		return I;	
@@ -635,16 +623,12 @@ public class Operacoes {
 	}
 	
 	public static Vetor encontrarL(Ponto p) {
-		return Operacoes.normalizar(Operacoes.subtrairPontos(p, Iluminacao.Pl));
+		return Operacoes.normalizar(Operacoes.subtrairPontos(Iluminacao.Pl, p));
 		
 	}
 	
 	public static Vetor encontrarV(Ponto p) {
-		Vetor v = new Vetor();
-		v.x = -p.x;
-		v.y = -p.y;
-		v.z = -p.z;
-		return Operacoes.normalizar(v);
+		return Operacoes.normalizar(subtrairPontos(new Ponto(0, 0, 0), p));
 		
 	}
 	
@@ -738,11 +722,26 @@ public class Operacoes {
 		r.close();
 	}
 	
-	public static void coordenadasTela(Triangulo t, int width, int height) {
+	public static void coordenadasTelaIluminacao(Triangulo t, int width, int height) {
 	
 		t.v1 = Operacoes.getProjecaoPerspectiva(t.vista1);
 		t.v2 = Operacoes.getProjecaoPerspectiva(t.vista2);
-		t.v3 =	Operacoes.getProjecaoPerspectiva(t.vista3);
+		t.v3 = Operacoes.getProjecaoPerspectiva(t.vista3);
+		
+		t.v1 = Operacoes.getCoordenadasNormalizadas(t.v1);
+		t.v2 = Operacoes.getCoordenadasNormalizadas(t.v2);
+		t.v3 = Operacoes.getCoordenadasNormalizadas(t.v3);
+		
+		t.v1 = Operacoes.getCoordenadasTela(width, height, t.v1);
+		t.v2 = Operacoes.getCoordenadasTela(width, height, t.v2);
+		t.v3 = Operacoes.getCoordenadasTela(width, height, t.v3);
+	}
+	
+	public static void coordenadasTelaBranco(Triangulo t, int width, int height) {
+		
+		t.v1 = Operacoes.getProjecaoPerspectiva(t.v1);
+		t.v2 = Operacoes.getProjecaoPerspectiva(t.v2);
+		t.v3 =	Operacoes.getProjecaoPerspectiva(t.v3);
 		
 		t.v1 = Operacoes.getCoordenadasNormalizadas(t.v1);
 		t.v2 = Operacoes.getCoordenadasNormalizadas(t.v2);
@@ -751,10 +750,6 @@ public class Operacoes {
 		t.v1 = Operacoes.getCoordenadasTela(width, height, t.v1);
 		t.v2 = Operacoes.getCoordenadasTela(width, height, t.v2);
 		t.v3 = Operacoes.getCoordenadasTela(width, height, t.v3);
-		
-		t.v1 = t.v1;
-		t.v2 = t.v2;
-		t.v3 = t.v3;
 	}
 
 	public static void pintaZBuffer(GraphicsContext gc) {
@@ -813,7 +808,7 @@ public class Operacoes {
 		      pTela[i].v2 = getCoordenadasVista(U, V, N, triangulos[i].v2);
 		      pTela[i].v3 = getCoordenadasVista(U, V, N, triangulos[i].v3);
 		      
-		      coordenadasTela(pTela[i], width, height);
+		      coordenadasTelaBranco(pTela[i], width, height);
 		 
 		      scanLine(pTela[i], 0);
 		 

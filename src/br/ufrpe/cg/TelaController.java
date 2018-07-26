@@ -245,11 +245,9 @@ public class TelaController extends Application implements Initializable{
 			Operacoes.carregarParametrosIluminacao();
 		}
 		
-		//pintaImagem();
 		try {
 			Operacoes.fazTudo(width, height, carregada);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -259,11 +257,9 @@ public class TelaController extends Application implements Initializable{
 			handleCarregar();
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
-			//pintaImagem();
 			try {
 				Operacoes.fazTudo(width, height, carregada);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -335,7 +331,6 @@ public class TelaController extends Application implements Initializable{
 	
 	
 	public static void main(String[] args) {
-		System.out.println("comecou");
 		launch(args);
 	}
 
