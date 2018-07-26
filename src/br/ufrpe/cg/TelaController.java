@@ -253,8 +253,9 @@ public class TelaController extends Application implements Initializable{
 	}
 	
 	public void handleCarrega(KeyEvent k) throws IOException {
-		if(k.getCode() == KeyCode.ENTER) 
-			handleCarregar();
+		if(k.getCode() == KeyCode.ENTER)
+			if(carregada != null)
+				handleCarregar();
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
 			try {

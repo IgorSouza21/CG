@@ -509,6 +509,7 @@ public class Operacoes {
 				if(b < 0)
 					b = 0;
 				zBuffer[x][y].c = Color.rgb((int) r, (int) g, (int) b);
+				zBuffer[x][y].z = p.z;
 			}
 		}
 	}
