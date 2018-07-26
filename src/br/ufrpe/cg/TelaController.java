@@ -73,13 +73,15 @@ public class TelaController extends Application implements Initializable{
 	private String carregada;
 	private CameraVirtual virtual;
 	private Iluminacao luz;
-	private int width = 500;
-	private int height = 500;
+	public static int width;
+	public static int height;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		tela = 4;
 		Operacoes.canvas = canvas;
+		width = (int) canvas.getWidth();
+		height = (int) canvas.getHeight();
 		try {
 			Operacoes.carregarParametrosCamera();
 			Operacoes.carregarParametrosIluminacao();
@@ -166,89 +168,86 @@ public class TelaController extends Application implements Initializable{
 	
 	
 	public void handleCarregar() throws IOException {
-		File camera = new File("Camera.txt");
-		BufferedWriter w = new BufferedWriter(new FileWriter(camera));
-		File luz = new File("Iluminacao.txt");
-		BufferedWriter wr = new BufferedWriter(new FileWriter(luz));
-		
-		Ponto c = new Ponto();
-		c.x = Double.parseDouble(Cx.getText());
-		c.y = Double.parseDouble(Cy.getText());
-		c.z = Double.parseDouble(Cz.getText());
-		Vetor n = new Vetor();
-		n.x = Double.parseDouble(Nx.getText());
-		n.y = Double.parseDouble(Ny.getText());
-		n.z = Double.parseDouble(Nz.getText());
-		Vetor v = new Vetor();
-		v.x = Double.parseDouble(Vx.getText());
-		v.y = Double.parseDouble(Vy.getText());
-		v.z = Double.parseDouble(Vz.getText());
-		
-		Vetor Iamb = new Vetor();
-		Iamb.x = Double.parseDouble(IambR.getText());
-		Iamb.y = Double.parseDouble(IambG.getText());
-		Iamb.z = Double.parseDouble(IambB.getText());
-		Vetor Il = new Vetor();
-		Il.x = Double.parseDouble(IlR.getText());
-		Il.y = Double.parseDouble(IlG.getText());
-		Il.z = Double.parseDouble(IlB.getText());
-		Ponto Pl = new Ponto();
-		Pl.x = Double.parseDouble(PlX.getText());
-		Pl.y = Double.parseDouble(PlY.getText());
-		Pl.z = Double.parseDouble(PlZ.getText());
-		Vetor Kd = new Vetor();
-		Kd.x = Double.parseDouble(KdR.getText());
-		Kd.y = Double.parseDouble(KdG.getText());
-		Kd.z = Double.parseDouble(KdB.getText());
-		Vetor Od = new Vetor();
-		Od.x = Double.parseDouble(OdR.getText());
-		Od.y = Double.parseDouble(OdG.getText());
-		Od.z = Double.parseDouble(OdB.getText());
-		
-		CameraVirtual x = new CameraVirtual(c,n, v, Double.parseDouble(D.getText()), Double.parseDouble(Hx.getText()),
-				Double.parseDouble(Hy.getText()));
-		if(!virtual.equals(x)) {
-			w.write("N = " + Nx.getText() + " " + Ny.getText() + " " + Nz.getText());
-			w.newLine();
-			w.write("V = " + Vx.getText() + " " + Vy.getText() + " " + Nz.getText());
-			w.newLine();
-			w.write("d = " + D.getText());
-			w.newLine();
-			w.write("hx = " + Hx.getText());
-			w.newLine();
-			w.write("hy = " + Hy.getText());
-			w.newLine();
-			w.write("C = " + Cx.getText() + " " + Cy.getText() + " " + Cz.getText());
-			w.close();
-			Operacoes.carregarParametrosCamera();
-		}
-		Iluminacao y = new Iluminacao(Iamb, Double.parseDouble(Ka.getText()), Il, Pl, Kd, Od, 
-				Double.parseDouble(Ks.getText()), Double.parseDouble(Eta.getText()));
-		
-		if(!this.luz.equals(y)) {
-			wr.write("Iamb = " + IambR.getText() + " " + IambG.getText() + " " + IambB.getText());
-			wr.newLine();
-			wr.write("Ka = " + Ka.getText());
-			wr.newLine();
-			wr.write("Il = " + IlR.getText() + " " + IlG.getText() + " " + IlB.getText());
-			wr.newLine();
-			wr.write("Pl = " + PlX.getText() + " " + PlY.getText() + " " + PlZ.getText());
-			wr.newLine();
-			wr.write("Kd = " + KdR.getText() + " " + KdG.getText() + " " + KdB.getText());
-			wr.newLine();
-			wr.write("Od = " + OdR.getText() + " " + OdG.getText() + " " + OdB.getText());
-			wr.newLine();
-			wr.write("Ks = " + Ks.getText());
-			wr.newLine();
-			wr.write("Eta = " + Eta.getText());
-			wr.close();
-			Operacoes.carregarParametrosIluminacao();
-		}
-		
-		try {
-			Operacoes.fazTudo(width, height, carregada);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (carregada != null) {
+			File camera = new File("Camera.txt");
+			BufferedWriter w = new BufferedWriter(new FileWriter(camera));
+			File luz = new File("Iluminacao.txt");
+			BufferedWriter wr = new BufferedWriter(new FileWriter(luz));
+			Ponto c = new Ponto();
+			c.x = Double.parseDouble(Cx.getText());
+			c.y = Double.parseDouble(Cy.getText());
+			c.z = Double.parseDouble(Cz.getText());
+			Vetor n = new Vetor();
+			n.x = Double.parseDouble(Nx.getText());
+			n.y = Double.parseDouble(Ny.getText());
+			n.z = Double.parseDouble(Nz.getText());
+			Vetor v = new Vetor();
+			v.x = Double.parseDouble(Vx.getText());
+			v.y = Double.parseDouble(Vy.getText());
+			v.z = Double.parseDouble(Vz.getText());
+			Vetor Iamb = new Vetor();
+			Iamb.x = Double.parseDouble(IambR.getText());
+			Iamb.y = Double.parseDouble(IambG.getText());
+			Iamb.z = Double.parseDouble(IambB.getText());
+			Vetor Il = new Vetor();
+			Il.x = Double.parseDouble(IlR.getText());
+			Il.y = Double.parseDouble(IlG.getText());
+			Il.z = Double.parseDouble(IlB.getText());
+			Ponto Pl = new Ponto();
+			Pl.x = Double.parseDouble(PlX.getText());
+			Pl.y = Double.parseDouble(PlY.getText());
+			Pl.z = Double.parseDouble(PlZ.getText());
+			Vetor Kd = new Vetor();
+			Kd.x = Double.parseDouble(KdR.getText());
+			Kd.y = Double.parseDouble(KdG.getText());
+			Kd.z = Double.parseDouble(KdB.getText());
+			Vetor Od = new Vetor();
+			Od.x = Double.parseDouble(OdR.getText());
+			Od.y = Double.parseDouble(OdG.getText());
+			Od.z = Double.parseDouble(OdB.getText());
+			CameraVirtual x = new CameraVirtual(c, n, v, Double.parseDouble(D.getText()),
+					Double.parseDouble(Hx.getText()), Double.parseDouble(Hy.getText()));
+			if (!virtual.equals(x)) {
+				w.write("N = " + Nx.getText() + " " + Ny.getText() + " " + Nz.getText());
+				w.newLine();
+				w.write("V = " + Vx.getText() + " " + Vy.getText() + " " + Nz.getText());
+				w.newLine();
+				w.write("d = " + D.getText());
+				w.newLine();
+				w.write("hx = " + Hx.getText());
+				w.newLine();
+				w.write("hy = " + Hy.getText());
+				w.newLine();
+				w.write("C = " + Cx.getText() + " " + Cy.getText() + " " + Cz.getText());
+				w.close();
+				Operacoes.carregarParametrosCamera();
+			}
+			Iluminacao y = new Iluminacao(Iamb, Double.parseDouble(Ka.getText()), Il, Pl, Kd, Od,
+					Double.parseDouble(Ks.getText()), Double.parseDouble(Eta.getText()));
+			if (!this.luz.equals(y)) {
+				wr.write("Iamb = " + IambR.getText() + " " + IambG.getText() + " " + IambB.getText());
+				wr.newLine();
+				wr.write("Ka = " + Ka.getText());
+				wr.newLine();
+				wr.write("Il = " + IlR.getText() + " " + IlG.getText() + " " + IlB.getText());
+				wr.newLine();
+				wr.write("Pl = " + PlX.getText() + " " + PlY.getText() + " " + PlZ.getText());
+				wr.newLine();
+				wr.write("Kd = " + KdR.getText() + " " + KdG.getText() + " " + KdB.getText());
+				wr.newLine();
+				wr.write("Od = " + OdR.getText() + " " + OdG.getText() + " " + OdB.getText());
+				wr.newLine();
+				wr.write("Ks = " + Ks.getText());
+				wr.newLine();
+				wr.write("Eta = " + Eta.getText());
+				wr.close();
+				Operacoes.carregarParametrosIluminacao();
+			}
+			try {
+				Operacoes.fazTudo(width, height, carregada);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
 		}
 	}
 	

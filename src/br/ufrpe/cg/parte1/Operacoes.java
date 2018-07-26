@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import br.ufrpe.cg.TelaController;
 import br.ufrpe.cg.beans.CameraVirtual;
 import br.ufrpe.cg.beans.Iluminacao;
 import br.ufrpe.cg.beans.Matriz;
@@ -270,9 +271,9 @@ public class Operacoes {
 			dois.v3 = t.v3;
 			
 			
- 
 			preencherTrianguloSuperior(um, t, k);
 			preencherTrianguloInferior(dois, t, k);
+
 		}
 	}
 	
@@ -482,8 +483,8 @@ public class Operacoes {
 		return zBuffer;
 	}
 	
-	public static void calcularCor(int x, int y, Triangulo t) {
-		if(!(x > 499 || x < 0 || y > 499 || y < 0)) {
+	public synchronized static void calcularCor(int x, int y, Triangulo t) {
+		if(!(x > TelaController.width-1 || x < 0 || y > TelaController.height-1 || y < 0)) {
 			double[] coord = Operacoes.coordenadaBaricentrica(new Ponto(x,y,0),	t.certo1, t.certo2, t.certo3);
 			
 			Ponto p = pOriginal(coord, t);
