@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import br.ufrpe.cg.beans.Animar;
 import br.ufrpe.cg.beans.CameraVirtual;
 import br.ufrpe.cg.beans.Iluminacao;
 import br.ufrpe.cg.beans.Ponto;
@@ -26,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -68,13 +70,16 @@ public class TelaController extends Application implements Initializable{
 	@FXML private TextField OdB;
 	@FXML private TextField Ks;
 	@FXML private TextField Eta;
+	@FXML private Button btnAnimar;
 	
 	private int tela;
-	private String carregada;
+	public static String carregada;
 	private CameraVirtual virtual;
 	private Iluminacao luz;
 	public static int width;
 	public static int height;
+	public static Animar anima;
+	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -158,7 +163,7 @@ public class TelaController extends Application implements Initializable{
 			}
 			else if(tela == 4) {
 				try {
-					Operacoes.fazTudo(width, height, carregada, 30);
+					Operacoes.fazTudo(width, height, carregada, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -244,7 +249,7 @@ public class TelaController extends Application implements Initializable{
 				Operacoes.carregarParametrosIluminacao();
 			}
 			try {
-				Operacoes.fazTudo(width, height, carregada, 30);
+				Operacoes.fazTudo(width, height, carregada, 0);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
@@ -258,7 +263,7 @@ public class TelaController extends Application implements Initializable{
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
 			try {
-				Operacoes.fazTudo(width, height, carregada, 30);
+				Operacoes.fazTudo(width, height, carregada, 0);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -266,8 +271,20 @@ public class TelaController extends Application implements Initializable{
 			
 	}
 	
-	private void animar() {
+	public void animar() {
 		
+		if(btnAnimar.getText().equals("Animar")) {
+			anima = new Animar();
+			Animar.parar = true;
+			Animar.angulo = 0;
+			btnAnimar.setText("Parar");
+			Thread a = new Thread(anima);
+			a.start();
+		}
+		else if(btnAnimar.getText().equals("Parar")) {
+			Animar.parar = false;
+			btnAnimar.setText("Animar");
+		}	
 	}
 	
 	private void preencheCampos() {

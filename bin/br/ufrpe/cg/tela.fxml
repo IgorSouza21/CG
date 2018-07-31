@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
    <children>
       <MenuBar layoutY="2.0" prefHeight="24.0" prefWidth="971.0" AnchorPane.bottomAnchor="562.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -162,10 +162,18 @@
                         </VBox>
                      </children>
                   </HBox>
-                  <StackPane>
+                  <StackPane prefHeight="25.0" prefWidth="149.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#handleCarregar" text="Carregar" />
+                        <HBox prefHeight="25.0" prefWidth="270.0" spacing="20.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#handleCarregar" text="Carregar" />
+                              <Button fx:id="btnAnimar" mnemonicParsing="false" onAction="#animar" text="Animar" />
+                           </children>
+                        </HBox>
                      </children>
+                     <VBox.margin>
+                        <Insets left="350.0" right="400.0" />
+                     </VBox.margin>
                   </StackPane>
                </children>
             </VBox>

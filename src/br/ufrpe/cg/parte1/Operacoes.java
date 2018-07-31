@@ -429,7 +429,7 @@ public class Operacoes {
 		
 	}
 	
-	public static void fazTudo(int width, int height, String s, double angulo) throws Exception {		
+	public static void fazTudo(int width, int height, String s, double angulo) throws Exception {
 		Operacoes.carregarPontosTriangulos(s);
 		Operacoes.carregarParametrosCamera();
 		Operacoes.carregarParametrosIluminacao();
@@ -443,6 +443,7 @@ public class Operacoes {
 			triangulos[i].vista1 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v1);
 			triangulos[i].vista2 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v2);
 			triangulos[i].vista3 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v3);
+			triangulos[i].normalTriangulo();
 			triangulos[i].calcularBaricentro();
 			
 		}
