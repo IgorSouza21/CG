@@ -114,7 +114,7 @@ public class TelaController extends Application implements Initializable{
 	}
 	
 	public void pintaImagem() {
-		if(carregada != null || carregada != "") {
+		if(carregada != null && carregada != "") {
 			if(tela == 0) {
 				canvas.setVisible(false);
 				questao1.setVisible(true);
@@ -125,7 +125,7 @@ public class TelaController extends Application implements Initializable{
 				canvas.getGraphicsContext2D().fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 				canvas.setVisible(true);
 				questao1.setVisible(false);
-				if(imagem != null && !carregada.equals("")) {
+				if(carregada != null && !carregada.equals("")) {
 					try {
 						Questao2.executar(carregada, canvas.getWidth(), canvas.getHeight(), 1, canvas);
 					} catch (IOException e) {
@@ -153,7 +153,7 @@ public class TelaController extends Application implements Initializable{
 				try {
 					Operacoes.pintaScanLine(canvas.getGraphicsContext2D(), width, height, carregada);
 				} catch (Exception e) {
-					erro(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 			else if(tela == 4) {

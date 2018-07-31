@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 
 public class Operacoes {
 	public static Ponto[] pontos;
+	public static Ponto[] rotacionados;
 	public static Triangulo[] triangulos;
 	public static Z[][] zBuffer;
 	public static Canvas canvas;
@@ -398,6 +399,15 @@ public class Operacoes {
 
 	public static Vetor somaVetores(Vetor A, Vetor B) {
 		Vetor temp = new Vetor();
+		temp.x = A.x + B.x;
+		temp.y = A.y + B.y;
+		temp.z = A.z + B.z;
+			
+		return temp;
+	}
+	
+	public static Ponto somaPontos(Ponto A, Ponto B) {
+		Ponto temp = new Ponto();
 		temp.x = A.x + B.x;
 		temp.y = A.y + B.y;
 		temp.z = A.z + B.z;
@@ -818,4 +828,144 @@ public class Operacoes {
 		    return gc.getCanvas();
 	 }
 		 
+	private static Ponto centroImagem() {
+		Ponto temp = new Ponto(0,0,0);
+		for (int i = 0; i < triangulos.length; i++) {
+			temp = somaPontos(temp, triangulos[i].baricentro);
+		}
+		
+		temp.x = temp.x / triangulos.length;
+		temp.y = temp.y / triangulos.length;
+		temp.z = temp.z / triangulos.length;
+		
+		return temp;
+		
+	}
+	
+	private static Matriz matrizTranslacao(Ponto p) {
+		Matriz translacao = new Matriz(4,4);
+		
+		translacao.setIJ(0, 0, 1);
+		translacao.setIJ(0, 1, 0);
+		translacao.setIJ(0, 2, 0);
+		translacao.setIJ(0, 3, p.x);
+		translacao.setIJ(1, 0, 0);
+		translacao.setIJ(1, 1, 1);
+		translacao.setIJ(1, 2, 0);
+		translacao.setIJ(1, 3, p.y);
+		translacao.setIJ(2, 0, 0);
+		translacao.setIJ(2, 1, 0);
+		translacao.setIJ(2, 2, 1);
+		translacao.setIJ(2, 3, p.z);
+		translacao.setIJ(3, 0, 0);
+		translacao.setIJ(3, 1, 0);
+		translacao.setIJ(3, 2, 0);
+		translacao.setIJ(3, 3, 1);
+		
+		return translacao;
+	}
+	
+	private static Matriz matrizRotacaoX(double angulo) {
+		Matriz rotacao = new Matriz(4,4);
+		
+		rotacao.setIJ(0, 0, 1);
+		rotacao.setIJ(0, 1, 0);
+		rotacao.setIJ(0, 2, 0);
+		rotacao.setIJ(0, 3, 0);
+		rotacao.setIJ(1, 0, 0);
+		rotacao.setIJ(1, 1, Math.cos(angulo));
+		rotacao.setIJ(1, 2, -Math.sin(angulo));
+		rotacao.setIJ(1, 3, 0);
+		rotacao.setIJ(2, 0, 0);
+		rotacao.setIJ(2, 1, Math.sin(angulo));
+		rotacao.setIJ(2, 2, Math.cos(angulo));
+		rotacao.setIJ(2, 3, 0);
+	
+		
+		return rotacao;
+	}
+	
+	private static Matriz matrizRotacaoY(double angulo) {
+		Matriz rotacao = new Matriz(4,4);
+		
+		rotacao.setIJ(0, 0, Math.cos(angulo));
+		rotacao.setIJ(0, 1, 0);
+		rotacao.setIJ(0, 2, -Math.sin(angulo));
+		rotacao.setIJ(0, 3, 0);
+		rotacao.setIJ(1, 0, 0);
+		rotacao.setIJ(1, 1, 1);
+		rotacao.setIJ(1, 2, 0);
+		rotacao.setIJ(1, 3, 0);
+		rotacao.setIJ(2, 0, Math.sin(angulo));
+		rotacao.setIJ(2, 1, 0);
+		rotacao.setIJ(2, 2, Math.cos(angulo));
+		rotacao.setIJ(2, 3, 0);
+	
+		
+		return rotacao;
+	}
+	
+	private static Matriz matrizRotacaoZ(double angulo) {
+		Matriz rotacao = new Matriz(4,4);
+		
+		rotacao.setIJ(0, 0, Math.cos(angulo));
+		rotacao.setIJ(0, 1, -Math.sin(angulo));
+		rotacao.setIJ(0, 2, 0);
+		rotacao.setIJ(0, 3, 0);
+		rotacao.setIJ(1, 0, Math.sin(angulo));
+		rotacao.setIJ(1, 1, Math.cos(angulo));
+		rotacao.setIJ(1, 2, 0);
+		rotacao.setIJ(1, 3, 0);
+		rotacao.setIJ(2, 0, 0);
+		rotacao.setIJ(2, 1, 0);
+		rotacao.setIJ(2, 2, 1);
+		rotacao.setIJ(2, 3, 0);
+	
+		
+		return rotacao;
+	}
+	
+	private static Matriz matrizRotacionar(double graus) {
+		
+		Ponto centro = centroImagem();
+		Ponto cont = new Ponto();
+		cont.x = -centro.x;
+		cont.y = -centro.y;
+		cont.z = -centro.z;
+		Matriz t = multiplicar(matrizRotacaoX(graus), matrizRotacaoY(graus));
+		t = multiplicar(t, matrizRotacaoZ(graus));
+		t = multiplicar(matrizTranslacao(centro), t);
+		t = multiplicar(t, matrizTranslacao(cont));
+		
+		return t;
+		
+	}
+	
+	public static Ponto rotacionar(Ponto p, Matriz T) {
+		Matriz k = new Matriz(4, 1);
+		k.setIJ(0, 0, p.x);
+		k.setIJ(1, 0, p.y);
+		k.setIJ(2, 0, p.z);
+		k.setIJ(3, 0, 1);
+		
+		Matriz t = multiplicar(T, k);
+		Ponto v = new Ponto();
+		v.x = t.getIJ(0, 0);
+		v.y = t.getIJ(1, 0);
+		v.z = t.getIJ(2, 0);
+		
+		
+		return v;
+	}
+	
+	
+	public static void rotacionando(double graus) {
+		Matriz T = matrizRotacionar(graus);
+		for (int i = 0; i < pontos.length; i++) {
+			rotacionados[i] = rotacionar(pontos[i], T);
+		}
+	}
+	
+	
 }
+
