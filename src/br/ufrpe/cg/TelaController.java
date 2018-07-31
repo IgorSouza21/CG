@@ -158,7 +158,7 @@ public class TelaController extends Application implements Initializable{
 			}
 			else if(tela == 4) {
 				try {
-					Operacoes.fazTudo(width, height, carregada);
+					Operacoes.fazTudo(width, height, carregada, 30);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -244,7 +244,7 @@ public class TelaController extends Application implements Initializable{
 				Operacoes.carregarParametrosIluminacao();
 			}
 			try {
-				Operacoes.fazTudo(width, height, carregada);
+				Operacoes.fazTudo(width, height, carregada, 30);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
@@ -258,12 +258,16 @@ public class TelaController extends Application implements Initializable{
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
 			try {
-				Operacoes.fazTudo(width, height, carregada);
+				Operacoes.fazTudo(width, height, carregada, 30);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 			
+	}
+	
+	private void animar() {
+		
 	}
 	
 	private void preencheCampos() {

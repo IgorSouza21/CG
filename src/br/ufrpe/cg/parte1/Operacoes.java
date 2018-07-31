@@ -19,7 +19,6 @@ import javafx.scene.paint.Color;
 
 public class Operacoes {
 	public static Ponto[] pontos;
-	public static Ponto[] rotacionados;
 	public static Triangulo[] triangulos;
 	public static Z[][] zBuffer;
 	public static Canvas canvas;
@@ -430,7 +429,7 @@ public class Operacoes {
 		
 	}
 	
-	public static void fazTudo(int width, int height, String s) throws Exception {
+	public static void fazTudo(int width, int height, String s, double angulo) throws Exception {		
 		Operacoes.carregarPontosTriangulos(s);
 		Operacoes.carregarParametrosCamera();
 		Operacoes.carregarParametrosIluminacao();
@@ -444,10 +443,19 @@ public class Operacoes {
 			triangulos[i].vista1 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v1);
 			triangulos[i].vista2 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v2);
 			triangulos[i].vista3 = Operacoes.getCoordenadasVista(U, V, N, triangulos[i].v3);
-			triangulos[i].normalTriangulo();
 			triangulos[i].calcularBaricentro();
+			
 		}
 		
+		if(angulo != 0 && angulo != 360) {
+			Matriz T = matrizRotacionar(Math.toRadians(angulo));
+			for (int i = 0; i < triangulos.length; i++) {
+				triangulos[i].vista1 = rotacionar(triangulos[i].vista1, T);
+				triangulos[i].vista2 = rotacionar(triangulos[i].vista2, T);
+				triangulos[i].vista3 = rotacionar(triangulos[i].vista3, T);
+				triangulos[i].normalTriangulo();
+			}
+		}
 		
 		calcularNormaisVertices();
 		
@@ -880,6 +888,10 @@ public class Operacoes {
 		rotacao.setIJ(2, 1, Math.sin(angulo));
 		rotacao.setIJ(2, 2, Math.cos(angulo));
 		rotacao.setIJ(2, 3, 0);
+		rotacao.setIJ(3, 0, 0);
+		rotacao.setIJ(3, 1, 0);
+		rotacao.setIJ(3, 2, 0);
+		rotacao.setIJ(3, 3, 1);
 	
 		
 		return rotacao;
@@ -900,6 +912,10 @@ public class Operacoes {
 		rotacao.setIJ(2, 1, 0);
 		rotacao.setIJ(2, 2, Math.cos(angulo));
 		rotacao.setIJ(2, 3, 0);
+		rotacao.setIJ(3, 0, 0);
+		rotacao.setIJ(3, 1, 0);
+		rotacao.setIJ(3, 2, 0);
+		rotacao.setIJ(3, 3, 1);
 	
 		
 		return rotacao;
@@ -920,6 +936,10 @@ public class Operacoes {
 		rotacao.setIJ(2, 1, 0);
 		rotacao.setIJ(2, 2, 1);
 		rotacao.setIJ(2, 3, 0);
+		rotacao.setIJ(3, 0, 0);
+		rotacao.setIJ(3, 1, 0);
+		rotacao.setIJ(3, 2, 0);
+		rotacao.setIJ(3, 3, 1);
 	
 		
 		return rotacao;
@@ -957,15 +977,6 @@ public class Operacoes {
 		
 		return v;
 	}
-	
-	
-	public static void rotacionando(double graus) {
-		Matriz T = matrizRotacionar(graus);
-		for (int i = 0; i < pontos.length; i++) {
-			rotacionados[i] = rotacionar(pontos[i], T);
-		}
-	}
-	
 	
 }
 
