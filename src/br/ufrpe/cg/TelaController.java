@@ -29,6 +29,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -71,8 +72,14 @@ public class TelaController extends Application implements Initializable{
 	@FXML private TextField Ks;
 	@FXML private TextField Eta;
 	@FXML private Button btnAnimar;
+	@FXML private ComboBox<String> cbxRotacao;
+	@FXML private TextField txfX;
+	@FXML private TextField txfY;
+	@FXML private TextField txfZ;
+	@FXML private Slider sldVelocidade;
 	
 	private int tela;
+	private int rotacao;
 	public static String carregada;
 	private CameraVirtual virtual;
 	private Iluminacao luz;
@@ -83,7 +90,9 @@ public class TelaController extends Application implements Initializable{
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
+		rotacao = -1;
 		tela = 4;
+		Animar.angulo = 0;
 		Operacoes.canvas = canvas;
 		width = (int) canvas.getWidth();
 		height = (int) canvas.getHeight();
@@ -102,6 +111,9 @@ public class TelaController extends Application implements Initializable{
 		im.add("piramide");
 		im.add("triangulo");
 		im.add("vaso");
+		txfX.setText("0.0");
+		txfY.setText("0.0");
+		txfZ.setText("0.0");
 		imagem.setItems(FXCollections.observableArrayList(im));
 		imagem.getSelectionModel().select("");
 		imagem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -113,6 +125,59 @@ public class TelaController extends Application implements Initializable{
 					pintaImagem();
 				}
 				
+			}
+			
+		});
+		
+		ArrayList<String> rot = new ArrayList<>();
+		rot.add("");
+		rot.add("Em X");
+		rot.add("Em Y");
+		rot.add("Em Z");
+		cbxRotacao.setItems(FXCollections.observableArrayList(rot));
+		cbxRotacao.getSelectionModel().select("");
+		cbxRotacao.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(arg2.equals("")) {
+					rotacao = -1;
+					txfX.setDisable(false);
+					txfY.setDisable(false);
+					txfZ.setDisable(false);
+					cbxRotacao.setDisable(true);
+				}
+				else if(arg2.equals("Em X")) {
+					rotacao = 0;
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+					cbxRotacao.setDisable(false);
+				}
+				else if(arg2.equals("Em Y")) {
+					rotacao = 1;
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+					cbxRotacao.setDisable(false);
+					
+				}
+				else if(arg2.equals("Em Z")) {
+					rotacao = 2;
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+				}
+				
+			}
+			
+		});
+		
+		sldVelocidade.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				Animar.velocidade = arg2.intValue();
 			}
 			
 		});
@@ -163,14 +228,17 @@ public class TelaController extends Application implements Initializable{
 			}
 			else if(tela == 4) {
 				try {
-					Operacoes.fazTudo(width, height, carregada, 0);
+					if(rotacao == -1)
+						Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
+					else
+						Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
+								Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-	
 	
 	public void handleCarregar() throws IOException {
 		if (carregada != null) {
@@ -249,7 +317,11 @@ public class TelaController extends Application implements Initializable{
 				Operacoes.carregarParametrosIluminacao();
 			}
 			try {
-				Operacoes.fazTudo(width, height, carregada, 0);
+				if(rotacao == -1)
+					Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
+				else
+					Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
+							Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
@@ -263,7 +335,11 @@ public class TelaController extends Application implements Initializable{
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
 			try {
-				Operacoes.fazTudo(width, height, carregada, 0);
+				if(rotacao == -1)
+					Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
+				else
+					Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
+							Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -274,14 +350,20 @@ public class TelaController extends Application implements Initializable{
 	public void animar() {
 		
 		if(btnAnimar.getText().equals("Animar")) {
+			txfX.setDisable(true);
+			txfY.setDisable(true);
+			txfZ.setDisable(true);
 			anima = new Animar();
 			Animar.parar = true;
-			Animar.angulo = 0;
+			Animar.rotacao = rotacao;
 			btnAnimar.setText("Parar");
 			Thread a = new Thread(anima);
 			a.start();
 		}
 		else if(btnAnimar.getText().equals("Parar")) {
+			txfX.setDisable(false);
+			txfY.setDisable(false);
+			txfZ.setDisable(false);
 			Animar.parar = false;
 			btnAnimar.setText("Animar");
 		}	
@@ -349,7 +431,6 @@ public class TelaController extends Application implements Initializable{
 		tela = 4;
 		pintaImagem();
 	}
-	
 	
 	public static void main(String[] args) {
 		launch(args);

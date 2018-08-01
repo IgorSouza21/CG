@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -17,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
    <children>
       <MenuBar layoutY="2.0" prefHeight="24.0" prefWidth="971.0" AnchorPane.bottomAnchor="562.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -80,10 +81,31 @@
                               <Label text="Hy" />
                               <TextField fx:id="Hy" />
                               <Label text="Imagem" />
-                              <ComboBox fx:id="imagem" prefHeight="25.0" prefWidth="196.0" />
+                              <HBox spacing="8.0">
+                                 <children>
+                                    <ComboBox fx:id="imagem" prefHeight="25.0" prefWidth="102.0" />
+                                    <ComboBox fx:id="cbxRotacao" prefHeight="25.0" prefWidth="117.0" />
+                                 </children>
+                              </HBox>
+                              <Label text="Rotação" />
+                              <HBox spacing="70.0">
+                                 <children>
+                                    <Label text="X" />
+                                    <Label text="Y" />
+                                    <Label text="Z" />
+                                 </children>
+                              </HBox>
+                              <HBox spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="txfX" />
+                                    <TextField fx:id="txfY" />
+                                    <TextField fx:id="txfZ" />
+                                 </children>
+                              </HBox>
+                              <Slider fx:id="sldVelocidade" max="2000.0" />
                            </children>
                            <padding>
-                              <Insets right="10.0" top="20.0" />
+                              <Insets right="10.0" top="10.0" />
                            </padding>
                            <HBox.margin>
                               <Insets right="-50.0" />
@@ -157,7 +179,7 @@
                               <TextField fx:id="Eta" />
                            </children>
                            <padding>
-                              <Insets top="20.0" />
+                              <Insets top="10.0" />
                            </padding>
                         </VBox>
                      </children>
