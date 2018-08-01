@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="585.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#handleCarrega" prefHeight="614.0" prefWidth="971.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.ufrpe.cg.TelaController">
    <children>
       <MenuBar layoutY="2.0" prefHeight="24.0" prefWidth="971.0" AnchorPane.bottomAnchor="562.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -97,12 +97,33 @@
                               </HBox>
                               <HBox spacing="5.0">
                                  <children>
-                                    <TextField fx:id="txfX" />
-                                    <TextField fx:id="txfY" />
-                                    <TextField fx:id="txfZ" />
+                                    <VBox>
+                                       <children>
+                                          <Slider fx:id="sldX" max="360.0" />
+                                          <TextField fx:id="txfX" disable="true" />
+                                       </children>
+                                    </VBox>
+                                    <VBox>
+                                       <children>
+                                          <Slider fx:id="sldY" max="360.0" />
+                                          <TextField fx:id="txfY" disable="true" />
+                                       </children>
+                                    </VBox>
+                                    <VBox>
+                                       <children>
+                                          <Slider fx:id="sldZ" max="360.0" />
+                                          <TextField fx:id="txfZ" disable="true" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </HBox>
-                              <Slider fx:id="sldVelocidade" max="2000.0" />
+                              <Label text="Velocidade" />
+                              <HBox>
+                                 <children>
+                                    <Slider fx:id="sldVelocidade" max="2000.0" />
+                                    <TextField fx:id="txfSlider" disable="true" prefHeight="25.0" prefWidth="65.0" />
+                                 </children>
+                              </HBox>
                            </children>
                            <padding>
                               <Insets right="10.0" top="10.0" />

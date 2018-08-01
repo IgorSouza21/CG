@@ -77,6 +77,10 @@ public class TelaController extends Application implements Initializable{
 	@FXML private TextField txfY;
 	@FXML private TextField txfZ;
 	@FXML private Slider sldVelocidade;
+	@FXML private Slider sldX;
+	@FXML private Slider sldY;
+	@FXML private Slider sldZ;
+	@FXML private TextField txfSlider;
 	
 	private int tela;
 	private int rotacao;
@@ -93,6 +97,10 @@ public class TelaController extends Application implements Initializable{
 		rotacao = -1;
 		tela = 4;
 		Animar.angulo = 0;
+		txfX.setText("0");
+		txfY.setText("0");
+		txfZ.setText("0");
+		txfSlider.setText("0");
 		Operacoes.canvas = canvas;
 		width = (int) canvas.getWidth();
 		height = (int) canvas.getHeight();
@@ -111,6 +119,7 @@ public class TelaController extends Application implements Initializable{
 		im.add("piramide");
 		im.add("triangulo");
 		im.add("vaso");
+		im.add("cubo");
 		txfX.setText("0.0");
 		txfY.setText("0.0");
 		txfZ.setText("0.0");
@@ -142,31 +151,31 @@ public class TelaController extends Application implements Initializable{
 			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
 				if(arg2.equals("")) {
 					rotacao = -1;
-					txfX.setDisable(false);
-					txfY.setDisable(false);
-					txfZ.setDisable(false);
-					cbxRotacao.setDisable(true);
+					sldX.setDisable(false);
+					sldY.setDisable(false);
+					sldZ.setDisable(false);
+					btnAnimar.setDisable(true);
 				}
 				else if(arg2.equals("Em X")) {
 					rotacao = 0;
-					txfX.setDisable(true);
-					txfY.setDisable(true);
-					txfZ.setDisable(true);
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
 					cbxRotacao.setDisable(false);
 				}
 				else if(arg2.equals("Em Y")) {
 					rotacao = 1;
-					txfX.setDisable(true);
-					txfY.setDisable(true);
-					txfZ.setDisable(true);
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
 					cbxRotacao.setDisable(false);
 					
 				}
 				else if(arg2.equals("Em Z")) {
 					rotacao = 2;
-					txfX.setDisable(true);
-					txfY.setDisable(true);
-					txfZ.setDisable(true);
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
 				}
 				
 			}
@@ -178,6 +187,32 @@ public class TelaController extends Application implements Initializable{
 			@Override
 			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
 				Animar.velocidade = arg2.intValue();
+				txfSlider.setText(""+ arg2.intValue());
+			}
+			
+		});
+		
+		sldX.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfX.setText(""+ arg2.intValue());
+			}
+			
+		});
+		sldY.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfY.setText(""+ arg2.intValue());
+			}
+			
+		});
+		sldZ.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfZ.setText(""+ arg2.intValue());
 			}
 			
 		});
@@ -228,11 +263,11 @@ public class TelaController extends Application implements Initializable{
 			}
 			else if(tela == 4) {
 				try {
-					if(rotacao == -1)
-						Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
-					else
+					if(rotacao != -1)
 						Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
 								Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
+					else
+						Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

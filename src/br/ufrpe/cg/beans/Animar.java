@@ -16,7 +16,6 @@ public class Animar implements Runnable{
 			try {
 				Thread.sleep(velocidade);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
@@ -24,7 +23,7 @@ public class Animar implements Runnable{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			angulo = angulo + 5;
+			angulo = angulo + 10;
 			angulo = angulo%360;
 		}
 		
