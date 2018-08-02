@@ -204,14 +204,13 @@ public class Operacoes {
 		B.setIJ(2, 0, temp.z);
 		
 		Matriz v = Operacoes.multiplicar(A, B);
-		
+
 		Ponto f = new Ponto();
 		f.x = v.getIJ(0, 0);
 		f.y = v.getIJ(1, 0);
 		f.z = v.getIJ(2, 0);
 		
 		return f;
-		
 	}
 	
 	public static Ponto getProjecaoPerspectiva(Ponto p) {
@@ -429,7 +428,7 @@ public class Operacoes {
 		
 	}
 	
-	public static void fazTudo(int width, int height, String s, double angulo, int rotacao, Ponto roda) throws Exception {
+	public static void fazTudo(int width, int height, String s, Matriz m) throws Exception {
 		Operacoes.carregarPontosTriangulos(s);
 		Operacoes.carregarParametrosCamera();
 		Operacoes.carregarParametrosIluminacao();
@@ -448,53 +447,18 @@ public class Operacoes {
 			
 		}
 		
-		if(rotacao != -1) {
-			Ponto c = centroImagem();
-			Matriz retornaTrans = matrizTranslacao(c.x, c.y, c.z);
-			Matriz trans = matrizTranslacao(-c.x, -c.y, -c.z);
-			Matriz T = null;
-			if(rotacao == 0) {
-				T = multiplicar(retornaTrans, matrizRotacaoX(Math.toRadians(angulo)));
-				T = multiplicar(T, trans);
-			}
-			else if(rotacao == 1) {
-				T = multiplicar(retornaTrans, matrizRotacaoY(Math.toRadians(angulo)));
-				T = multiplicar(T, trans);
-			}
-			else if(rotacao == 2) {
-				T = multiplicar(retornaTrans, matrizRotacaoZ(Math.toRadians(angulo)));
-				T = multiplicar(T, trans);
-			}
-
-			for (int i = 0; i < triangulos.length; i++) {
-				triangulos[i].vista1 = rotacionar(triangulos[i].vista1, T);
-				triangulos[i].vista2 = rotacionar(triangulos[i].vista2, T);
-				triangulos[i].vista3 = rotacionar(triangulos[i].vista3, T);
-				triangulos[i].normalTriangulo();
-				triangulos[i].calcularBaricentro();
-				
-			}
-		}
-		if(roda != null) {
-			Ponto c = centroImagem();
-			Matriz retornaTrans = matrizTranslacao(c.x, c.y, c.z);
-			Matriz trans = matrizTranslacao(-c.x, -c.y, -c.z);
-			Matriz x = matrizRotacaoX(Math.toRadians(roda.x));
-			Matriz y = matrizRotacaoX(Math.toRadians(roda.y));
-			Matriz z = matrizRotacaoX(Math.toRadians(roda.z));
-			Matriz T = multiplicar(retornaTrans, x);
-			T = multiplicar(T, y);
-			T = multiplicar(T, z);
-			T = multiplicar(T, trans);
-			
-			for (int i = 0; i < triangulos.length; i++) {
-				triangulos[i].vista1 = rotacionar(triangulos[i].vista1, T);
-				triangulos[i].vista2 = rotacionar(triangulos[i].vista2, T);
-				triangulos[i].vista3 = rotacionar(triangulos[i].vista3, T);
-				triangulos[i].normalTriangulo();
-				triangulos[i].calcularBaricentro();
-				
-			}
+		Ponto c = centroImagem();
+		Matriz retornaTrans = matrizTranslacao(c.x, c.y, c.z);
+		Matriz trans = matrizTranslacao(-c.x, -c.y, -c.z);
+		Matriz T = multiplicar(retornaTrans, m);
+		T = multiplicar(T, trans);
+		
+		for(int i = 0; i < triangulos.length; i++) {
+			triangulos[i].vista1 = Operacoes.rotacionar(triangulos[i].vista1, T);
+			triangulos[i].vista2 = Operacoes.rotacionar(triangulos[i].vista2, T);
+			triangulos[i].vista3 = Operacoes.rotacionar(triangulos[i].vista3, T);
+			triangulos[i].normalTriangulo();
+			triangulos[i].calcularBaricentro();
 			
 		}
 		
@@ -877,7 +841,7 @@ public class Operacoes {
 		    return gc.getCanvas();
 	 }
 		 
-	private static Ponto centroImagem() {
+	public static Ponto centroImagem() {
 		Ponto temp = new Ponto(0,0,0);
 		for (int i = 0; i < triangulos.length; i++) {
 			temp = somaPontos(temp, triangulos[i].baricentro);
@@ -891,7 +855,7 @@ public class Operacoes {
 		
 	}
 	
-	private static Matriz matrizTranslacao(double x, double y, double z) {
+	public static Matriz matrizTranslacao(double x, double y, double z) {
 		Matriz translacao = new Matriz(4,4);
 		
 		translacao.setIJ(0, 0, 1);
@@ -914,7 +878,7 @@ public class Operacoes {
 		return translacao;
 	}
 	
-	private static Matriz matrizRotacaoX(double radianos) {
+	public static Matriz matrizRotacaoX(double radianos) {
 		Matriz rotacao = new Matriz(4,4);
 		
 		rotacao.setIJ(0, 0, 1);
@@ -938,7 +902,7 @@ public class Operacoes {
 		return rotacao;
 	}
 	
-	private static Matriz matrizRotacaoY(double radianos) {
+	public static Matriz matrizRotacaoY(double radianos) {
 		Matriz rotacao = new Matriz(4,4);
 		
 		rotacao.setIJ(0, 0, Math.cos(radianos));
@@ -962,7 +926,7 @@ public class Operacoes {
 		return rotacao;
 	}
 	
-	private static Matriz matrizRotacaoZ(double radianos) {
+	public static Matriz matrizRotacaoZ(double radianos) {
 		Matriz rotacao = new Matriz(4,4);
 		
 		rotacao.setIJ(0, 0, Math.cos(radianos));
@@ -984,6 +948,32 @@ public class Operacoes {
 	
 		
 		return rotacao;
+	}
+	
+	public static Matriz matrizIdentidade() {
+		Matriz m = new Matriz(4,4);
+		m.setIJ(0, 0, 1);
+		m.setIJ(0, 1, 0);
+		m.setIJ(0, 2, 0);
+		m.setIJ(0, 3, 0);
+		
+		m.setIJ(1, 0, 0);
+		m.setIJ(1, 1, 1);
+		m.setIJ(1, 2, 0);
+		m.setIJ(1, 3, 0);
+		
+		m.setIJ(2, 0, 0);
+		m.setIJ(2, 1, 0);
+		m.setIJ(2, 2, 1);
+		m.setIJ(2, 3, 0);
+		
+		m.setIJ(3, 0, 0);
+		m.setIJ(3, 1, 0);
+		m.setIJ(3, 2, 0);
+		m.setIJ(3, 3, 1);
+		
+		return m;
+		
 	}
 	
 	public static Ponto rotacionar(Ponto p, Matriz T) {

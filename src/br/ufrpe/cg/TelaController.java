@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import br.ufrpe.cg.beans.Animar;
 import br.ufrpe.cg.beans.CameraVirtual;
 import br.ufrpe.cg.beans.Iluminacao;
+import br.ufrpe.cg.beans.Matriz;
 import br.ufrpe.cg.beans.Ponto;
 import br.ufrpe.cg.beans.Vetor;
 import br.ufrpe.cg.parte1.Operacoes;
@@ -83,139 +84,23 @@ public class TelaController extends Application implements Initializable{
 	@FXML private TextField txfSlider;
 	
 	private int tela;
-	private int rotacao;
 	public static String carregada;
 	private CameraVirtual virtual;
 	private Iluminacao luz;
 	public static int width;
 	public static int height;
 	public static Animar anima;
+	public static Matriz aplicada;
 	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		rotacao = -1;
-		tela = 4;
-		Animar.angulo = 0;
-		txfX.setText("0");
-		txfY.setText("0");
-		txfZ.setText("0");
-		txfSlider.setText("0");
-		Operacoes.canvas = canvas;
-		width = (int) canvas.getWidth();
-		height = (int) canvas.getHeight();
-		try {
-			Operacoes.carregarParametrosCamera();
-			Operacoes.carregarParametrosIluminacao();
-			preencheCampos();
-		} catch (IOException e) {
-			erro("Camera.txt ou Iluminacao.txt");
-		}
-		ArrayList<String> im = new ArrayList<>();
-		im.add("");
-		im.add("calice2");
-		im.add("maca");
-		im.add("maca2");
-		im.add("piramide");
-		im.add("triangulo");
-		im.add("vaso");
-		im.add("cubo");
-		txfX.setText("0.0");
-		txfY.setText("0.0");
-		txfZ.setText("0.0");
-		imagem.setItems(FXCollections.observableArrayList(im));
-		imagem.getSelectionModel().select("");
-		imagem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-
-			@Override
-			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-				if(arg2 != "") {
-					carregada = arg2 + ".byu";
-					pintaImagem();
-				}
-				
-			}
-			
-		});
-		
-		ArrayList<String> rot = new ArrayList<>();
-		rot.add("");
-		rot.add("Em X");
-		rot.add("Em Y");
-		rot.add("Em Z");
-		cbxRotacao.setItems(FXCollections.observableArrayList(rot));
-		cbxRotacao.getSelectionModel().select("");
-		cbxRotacao.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-
-			@Override
-			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-				if(arg2.equals("")) {
-					rotacao = -1;
-					sldX.setDisable(false);
-					sldY.setDisable(false);
-					sldZ.setDisable(false);
-					btnAnimar.setDisable(true);
-				}
-				else if(arg2.equals("Em X")) {
-					rotacao = 0;
-					sldX.setDisable(true);
-					sldY.setDisable(true);
-					sldZ.setDisable(true);
-					cbxRotacao.setDisable(false);
-				}
-				else if(arg2.equals("Em Y")) {
-					rotacao = 1;
-					sldX.setDisable(true);
-					sldY.setDisable(true);
-					sldZ.setDisable(true);
-					cbxRotacao.setDisable(false);
-					
-				}
-				else if(arg2.equals("Em Z")) {
-					rotacao = 2;
-					sldX.setDisable(true);
-					sldY.setDisable(true);
-					sldZ.setDisable(true);
-				}
-				
-			}
-			
-		});
-		
-		sldVelocidade.valueProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				Animar.velocidade = arg2.intValue();
-				txfSlider.setText(""+ arg2.intValue());
-			}
-			
-		});
-		
-		sldX.valueProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				txfX.setText(""+ arg2.intValue());
-			}
-			
-		});
-		sldY.valueProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				txfY.setText(""+ arg2.intValue());
-			}
-			
-		});
-		sldZ.valueProperty().addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-				txfZ.setText(""+ arg2.intValue());
-			}
-			
-		});
+		inicializa();
+		comboBoxImagem();
+		comboxRotacao();
+		sliderVelocidade();
+		sliders();
+		textfields();
 	}
 	
 	public void pintaImagem() {
@@ -263,11 +148,7 @@ public class TelaController extends Application implements Initializable{
 			}
 			else if(tela == 4) {
 				try {
-					if(rotacao != -1)
-						Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
-								Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
-					else
-						Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
+					Operacoes.fazTudo(width, height, carregada, aplicada);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -352,11 +233,7 @@ public class TelaController extends Application implements Initializable{
 				Operacoes.carregarParametrosIluminacao();
 			}
 			try {
-				if(rotacao == -1)
-					Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
-				else
-					Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
-							Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
+				Operacoes.fazTudo(width, height, carregada, aplicada);
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
@@ -370,11 +247,7 @@ public class TelaController extends Application implements Initializable{
 		if(k.getCode() ==  KeyCode.F5) {
 			preencheCampos();
 			try {
-				if(rotacao == -1)
-					Operacoes.fazTudo(width, height, carregada, 0, rotacao, null);
-				else
-					Operacoes.fazTudo(width, height, carregada, 0, rotacao, new Ponto(Double.parseDouble(txfX.getText()),
-							Double.parseDouble(txfX.getText()),Double.parseDouble(txfX.getText())));
+				Operacoes.fazTudo(width, height, carregada, aplicada);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -389,8 +262,13 @@ public class TelaController extends Application implements Initializable{
 			txfY.setDisable(true);
 			txfZ.setDisable(true);
 			anima = new Animar();
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em X"))
+				anima.setRotacaoX(10);
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Y"))
+				anima.setRotacaoY(10);
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Z"))
+				anima.setRotacaoZ(10);
 			Animar.parar = true;
-			Animar.rotacao = rotacao;
 			btnAnimar.setText("Parar");
 			Thread a = new Thread(anima);
 			a.start();
@@ -482,6 +360,216 @@ public class TelaController extends Application implements Initializable{
 			e1.printStackTrace();
 		}
 		
+	}
+	
+	private void inicializa() {
+		
+		tela = 4;
+		Animar.angulo = 0;
+		aplicada = Operacoes.matrizIdentidade();
+		txfX.setText("0");
+		txfY.setText("0");
+		txfZ.setText("0");
+		txfSlider.setText("0");
+		Operacoes.canvas = canvas;
+		width = (int) canvas.getWidth();
+		height = (int) canvas.getHeight();
+		try {
+			Operacoes.carregarParametrosCamera();
+			Operacoes.carregarParametrosIluminacao();
+			preencheCampos();
+		} catch (IOException e) {
+			erro("Camera.txt ou Iluminacao.txt");
+		}
+	}
+	
+	private void comboBoxImagem() {
+		ArrayList<String> im = new ArrayList<>();
+		im.add("");
+		im.add("calice2");
+		im.add("maca");
+		im.add("maca2");
+		im.add("piramide");
+		im.add("triangulo");
+		im.add("vaso");
+		im.add("cubo");
+		im.add("cow");
+		txfX.setText("0.0");
+		txfY.setText("0.0");
+		txfZ.setText("0.0");
+		imagem.setItems(FXCollections.observableArrayList(im));
+		imagem.getSelectionModel().select("");
+		imagem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(arg2 != "") { 
+					carregada = arg2 + ".byu"; pintaImagem();
+				}
+			} 
+		});
+	}
+	
+	private void comboxRotacao() {
+		ArrayList<String> rot = new ArrayList<>();
+		rot.add("");
+		rot.add("Em X");
+		rot.add("Em Y");
+		rot.add("Em Z");
+		cbxRotacao.setItems(FXCollections.observableArrayList(rot));
+		cbxRotacao.getSelectionModel().select("");
+		cbxRotacao.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(arg2.equals("")) {
+					sldX.setDisable(false);
+					sldY.setDisable(false);
+					sldZ.setDisable(false);
+					txfX.setDisable(false);
+					txfY.setDisable(false);
+					txfZ.setDisable(false);
+					btnAnimar.setDisable(true);
+					aplicada = Operacoes.matrizIdentidade();
+				}
+				else if(arg2.equals("Em X")) {
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+					cbxRotacao.setDisable(false);
+				}
+				else if(arg2.equals("Em Y")) {
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+					cbxRotacao.setDisable(false);
+				}
+				else if(arg2.equals("Em Z")) {
+					sldX.setDisable(true);
+					sldY.setDisable(true);
+					sldZ.setDisable(true);
+					txfX.setDisable(true);
+					txfY.setDisable(true);
+					txfZ.setDisable(true);
+					cbxRotacao.setDisable(false);
+				}	
+			}
+		});
+	}
+	
+	private void sliderVelocidade() {
+		sldVelocidade.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				Animar.velocidade = arg2.intValue();
+				txfSlider.setText(""+ arg2.intValue());
+			}
+		});
+	}
+	
+	private void sliders() {
+		sldX.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfX.setText(""+ arg2.intValue());
+				aplicada = Operacoes.matrizRotacaoX(arg2.intValue());
+				pintaImagem();
+			}
+			
+		});
+		sldY.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfY.setText(""+ arg2.intValue());
+				aplicada = Operacoes.matrizRotacaoY(arg2.intValue());
+				pintaImagem();
+			}
+			
+		});
+		sldZ.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				txfZ.setText(""+ arg2.intValue());
+				aplicada = Operacoes.matrizRotacaoZ(arg2.intValue());
+				pintaImagem();
+			}
+			
+		});
+	}
+	
+	private void textfields() {
+		txfX.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(Double.parseDouble(arg2) < sldX.getMax()) {
+					sldX.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldX.setValue(sldX.getMax());
+				
+				if(Double.parseDouble(arg2) > sldX.getMin()) {
+					sldX.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldX.setValue(sldX.getMin());
+			}
+			
+		});
+		
+		txfY.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(Double.parseDouble(arg2) < sldY.getMax()) {
+					sldY.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldY.setValue(sldY.getMax());
+				
+				if(Double.parseDouble(arg2) > sldY.getMin()) {
+					sldY.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldY.setValue(sldY.getMin());
+			}
+			
+		});
+		
+		txfZ.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+				if(Double.parseDouble(arg2) < sldZ.getMax()) {
+					sldZ.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldZ.setValue(sldZ.getMax());
+				
+				if(Double.parseDouble(arg2) > sldZ.getMin()) {
+					sldZ.setValue(Double.parseDouble(arg2));
+					
+				}
+				else
+					sldZ.setValue(sldZ.getMin());
+			}
+			
+		});
+		
+		//txfX.addEventHandler(EventType., arg1);
 	}
 
 }
