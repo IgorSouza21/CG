@@ -21,7 +21,7 @@ public class Operacoes {
 	public static Ponto[] pontos;
 	public static Triangulo[] triangulos;
 	public static Z[][] zBuffer;
-	public static Canvas canvas;
+	public static GraphicsContext gc;
 
 	private static double mul(double[] linha, double[] coluna) {
 		double res = 0;
@@ -292,7 +292,7 @@ public class Operacoes {
 		for(int yScan = (int) t.v3.y; yScan >= t.v1.y; yScan--) {
 			for(int x = (int) xMin; x <= (int) xMax; x++) {
 				if(k == 0) {
-					paint(canvas.getGraphicsContext2D(), x, yScan, Color.WHITE);
+					paint(x, yScan, Color.WHITE);
 				}
 				else
 					calcularCor(x, yScan, maior);
@@ -318,7 +318,7 @@ public class Operacoes {
 		for(int yScan = (int) t.v1.y; yScan <= t.v2.y; yScan++) { 
 			for(int x = (int) xMin; x <= (int) xMax; x++) {
 				if(k == 0) {
-					paint(canvas.getGraphicsContext2D(), x, yScan, Color.WHITE);
+					paint(x, yScan, Color.WHITE);
 				}
 				else
 					calcularCor(x, yScan, maior);
@@ -472,7 +472,7 @@ public class Operacoes {
 			coordenadasTelaIluminacao(triangulos[i], width, height);
 			Operacoes.scanLine(triangulos[i], 1);
 		}
-		pintaZBuffer(canvas.getGraphicsContext2D());
+		pintaZBuffer();
 	}
 	
 	public static Ponto pOriginal(double[] coord, Triangulo t) {
@@ -777,17 +777,18 @@ public class Operacoes {
 		t.v3 = Operacoes.getCoordenadasTela(width, height, t.v3);
 	}
 
-	public static void pintaZBuffer(GraphicsContext gc) {
+	public static void pintaZBuffer() {
 		for(int i = 0; i < Operacoes.getZBuffer().length; i++) {
 			for(int j = 0; j < Operacoes.getZBuffer().length; j++) {
-				paint(gc, i, j, Operacoes.getZBuffer()[i][j].c);
+				paint(i, j, Operacoes.getZBuffer()[i][j].c);
 			}
 		}
+		
 	}
 	
-	public static void paint(GraphicsContext g, int x, int y, Color c){
-		g.setFill(c);
-		g.fillRect(x-1, y, 1, 1);
+	public static void paint(int x, int y, Color c){
+		gc.setFill(c);
+		gc.fillRect(x-1, y, 1, 1);
 	}
 
 	public static Canvas pintaProjecaoOrtogonal(GraphicsContext gc, int width, int height, String s) throws Exception{
@@ -808,7 +809,7 @@ public class Operacoes {
 	      pTela[i] = Operacoes.getCoordenadasNormalizadas(pTela[i]);
 	      pTela[i] = Operacoes.getCoordenadasTela(width, height, pTela[i]);
 	 
-	      paint(gc, (int) pTela[i].x, (int) pTela[i].y, Color.WHITE);
+	      paint((int) pTela[i].x, (int) pTela[i].y, Color.WHITE);
 	 
 	    }
 	 

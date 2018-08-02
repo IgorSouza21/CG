@@ -91,7 +91,7 @@ public class TelaController extends Application implements Initializable{
 	public static int height;
 	public static Animar anima;
 	public static Matriz aplicada;
-	
+	public static double anguloGuardado;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -262,22 +262,41 @@ public class TelaController extends Application implements Initializable{
 			txfY.setDisable(true);
 			txfZ.setDisable(true);
 			anima = new Animar();
-			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em X"))
-				anima.setRotacaoX(10);
-			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Y"))
-				anima.setRotacaoY(10);
-			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Z"))
-				anima.setRotacaoZ(10);
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em X")) {
+				anima.setRotacaoX(anguloGuardado);
+				Animar.rotacao = 0;
+			}
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Y")) {
+				anima.setRotacaoY(anguloGuardado);
+				Animar.rotacao = 1;
+			}
+			if(cbxRotacao.getSelectionModel().getSelectedItem().equals("Em Z")) {
+				anima.setRotacaoZ(anguloGuardado);
+				Animar.rotacao = 2;
+			}
 			Animar.parar = true;
 			btnAnimar.setText("Parar");
 			Thread a = new Thread(anima);
 			a.start();
+			
+			new Thread() {
+				@Override
+				public void run() {
+					if(Animar.execucoes == 5) {
+						Animar.parar = false;
+						if(Animar.execucoes == 0) {
+							animar();							
+						}
+					}
+				}
+			}.start();
 		}
 		else if(btnAnimar.getText().equals("Parar")) {
 			txfX.setDisable(false);
 			txfY.setDisable(false);
 			txfZ.setDisable(false);
 			Animar.parar = false;
+			anguloGuardado = Animar.angulo;
 			btnAnimar.setText("Animar");
 		}	
 	}
@@ -366,12 +385,13 @@ public class TelaController extends Application implements Initializable{
 		
 		tela = 4;
 		Animar.angulo = 0;
+		anguloGuardado = 0;
 		aplicada = Operacoes.matrizIdentidade();
 		txfX.setText("0");
 		txfY.setText("0");
 		txfZ.setText("0");
 		txfSlider.setText("0");
-		Operacoes.canvas = canvas;
+		Operacoes.gc = canvas.getGraphicsContext2D();
 		width = (int) canvas.getWidth();
 		height = (int) canvas.getHeight();
 		try {

@@ -10,9 +10,11 @@ public class Animar implements Runnable{
 	public static double angulo;
 	public static int velocidade;
 	private static Matriz a;
+	public static int execucoes;
 
 	@Override
 	public void run() {
+		execucoes = 0;
 		while(parar) {
 			try {
 				Thread.sleep(velocidade);
@@ -33,20 +35,25 @@ public class Animar implements Runnable{
 				setRotacaoZ(angulo);
 			angulo = angulo + 10;
 			angulo = angulo%360;
+			execucoes++;
 		}
+		execucoes = 0;
 		
 	}
 	
 	public void setRotacaoX(double rotacao) {
-		a = Operacoes.matrizRotacaoX(Math.toRadians(rotacao));
+		angulo = rotacao;
+		a = Operacoes.matrizRotacaoX(Math.toRadians(angulo));
 	}
 	
 	public void setRotacaoY(double rotacao) {
-		a = Operacoes.matrizRotacaoY(Math.toRadians(rotacao));
+		angulo = rotacao;
+		a = Operacoes.matrizRotacaoY(Math.toRadians(angulo));
 	}
 	
 	public void setRotacaoZ(double rotacao) {
-		a = Operacoes.matrizRotacaoZ(Math.toRadians(rotacao));
+		angulo = rotacao;
+		a = Operacoes.matrizRotacaoZ(Math.toRadians(angulo));
 	}
 	
 	

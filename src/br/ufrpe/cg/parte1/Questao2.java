@@ -21,7 +21,7 @@ public class Questao2 {
 	
 	private static void pinta(Canvas c) {
 		for(int i = 0; i < getNormais().length; i++) {
-			Operacoes.paint(c.getGraphicsContext2D(),(int) Questao2.getNormais()[i].x, 
+			Operacoes.paint((int) Questao2.getNormais()[i].x, 
 					(int) Questao2.getNormais()[i].y, Color.WHITE);	
 		}
 	}
